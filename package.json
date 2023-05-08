@@ -1,0 +1,9 @@
+{
+  "name": "2800-202310-BBY25",
+  "version": "1.0.0",
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "openai": "^3.2.1",
+    "readline-sync": "^1.4.10"
+  }
+}
