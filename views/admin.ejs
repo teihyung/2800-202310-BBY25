@@ -1,0 +1,35 @@
+<%- include("templates/header") %>
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th>Username</th>
+        <th>Email</th>
+        <th>User Type</th>
+        <th>Action</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% for(let i=0; i < users.length; i++) { %>
+        <tr>
+            <td><%= users[i].username %></td>
+            <td><%= users[i].email %></td>
+            <td><%= users[i].user_type %></td>
+            <td>
+                <% if (users[i].user_type === 'user') { %>
+                    <form action="/promote/<%= users[i]._id %>" method="post">
+                        <button type="submit" class="btn btn-danger">Promote</button>
+                    </form>
+                <% } else { %>
+                    <form action="/demote/<%= users[i]._id %>" method="post">
+                        <button type="submit" class="btn btn-warning">Demote</button>
+                    </form>
+                <% } %>
+            </td>
+        </tr>
+    <% } %>
+    </tbody>
+</table>
+
+<button type="button" class="btn btn-primary rounded-pill px-3" onclick="window.location.href='/members'">return to members page</button>
+
+<%- include("templates/footer") %>
