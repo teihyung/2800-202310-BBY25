@@ -309,6 +309,46 @@ app.get('/members', async (req,res) => {
         }
   });
 
+  app.post('/bookmarks/add', sessionValidation, async (req, res) => {
+    if(req.session.authenticated){
+        try {
+            const { title, url } = req.body;   // ???
+            const userId = req.session.userId; 
+      
+            await database.db(mongodb_database).collection('bookmarks').insertOne({username: username, title: title, url: url}
+
+            );
+            console.log("Inserted user");
+
+      
+            res.status(200).send('Bookmark added successfully');
+          } catch (error) {
+            console.log(error);
+            res.status(500).send('Internal server error');
+          }
+        } else {
+          res.status(401).send('Unauthorized');
+        }
+  })
+
+  app.get('/bookmarks', sessionValidation, async (req, res) => {
+    if (req.session.authenticated) {
+      try {
+        const userId = req.session.userId; 
+  
+        const bookmarks = await database.db(mongodb_database).collection('bookmarks').find({ userId }).toArray();
+  
+        res.status(200).json(bookmarks);
+      } catch (error) {
+        console.log(error);
+        res.status(500).send('Internal server error');
+      }
+    } else {
+      res.status(401).send('Unauthorized');
+    }
+  });
+  
+
 app.use(express.static(__dirname + "/public"));
 
 app.get("*", (req,res) => {
