@@ -293,6 +293,22 @@ app.get('/members', async (req,res) => {
 	}
   });
 
+  app.get('/profile', async(req, res) => {
+    if(req.session.authenticated) {
+        try {
+            const result = await userCollection.find({email: req.session.email}).project({username: 1, email: 1, password: 1}).toArray();
+            res.render("profile", {username: result[0].username, email: result[0].email, password: result[0].password});
+            return;
+          } catch (error) {
+            console.log(error);
+            res.redirect('/login');
+          }
+        } else  {
+            res.redirect('/login');
+            return;
+        }
+  });
+
 app.use(express.static(__dirname + "/public"));
 
 app.get("*", (req,res) => {
