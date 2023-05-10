@@ -32,7 +32,7 @@ app.get('/', async (req, res) => {
     const ingredient = req.query.ingredient;
   
     if (!ingredient) {
-      res.render('search', { recipes: [] });
+      res.render('index', { recipes: [] });
       return;
     }
   
@@ -56,7 +56,7 @@ app.get('/', async (req, res) => {
     }
   });
   
-  
+
   
   
 
