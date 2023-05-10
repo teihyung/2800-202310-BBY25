@@ -1,0 +1,16 @@
+<%- include("templates/header") %>
+<% if (recipes.length > 0) { %>
+    <div class="mt-5">
+      <h2>Recipes</h2>
+      <ul class="list-group">
+        <% recipes.forEach(function(recipe) { %>
+          <li class="list-group-item">
+            <a href="/recipe/<%= encodeURIComponent(recipe) %>"><%= recipe %></a>
+          </li>
+        <% }); %>
+      </ul>
+    </div>
+  <% } %>
+</div>
+
+<%- include("templates/footer") %>
