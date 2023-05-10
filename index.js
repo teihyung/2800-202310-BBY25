@@ -75,37 +75,42 @@ const openaiConfiguration = new Configuration({
 });
 const openai = new OpenAIApi(openaiConfiguration);
 
-app.get('/', async (req, res) => {
-    const ingredient = req.query.ingredient;
-  
-    if (!ingredient) {
-      res.render('index', { recipes: [] });
-      return;
-    }
-  
-    const messages = [
-      { role: 'system', content: 'You are a helpful assistant that suggests recipes based on given ingredients.' },
-      { role: 'user', content: `Give me some recipes with ${ingredient}.` },
-    ];
-  
-    try {
-      const completion = await openai.createChatCompletion({
-        model: 'gpt-3.5-turbo',
-        messages: messages,
-      });
-  
-      const completionText = completion.data.choices[0].message.content;
-      const recipes = completionText.split('\n').filter(recipe => recipe.trim() !== '');
-      res.render('search', { recipes: recipes });
-    } catch (error) {
-      console.log(error);
-      res.status(500).send('Error retrieving recipes.');
-    }
-  });
-  
+app.get('/', (req, res) => {
+    res.render("main");
+});
 
-  
-  
+// app.get('/members', async (req, res) => {
+//
+//     const ingredient = req.query.ingredient;
+//
+//     if (!ingredient) {
+//       res.render('index', { recipes: [] });
+//       return;
+//     }
+//
+//     const messages = [
+//       { role: 'system', content: 'You are a helpful assistant that suggests recipes based on given ingredients.' },
+//       { role: 'user', content: `Give me some recipes with ${ingredient}.` },
+//     ];
+//
+//     try {
+//       const completion = await openai.createChatCompletion({
+//         model: 'gpt-3.5-turbo',
+//         messages: messages,
+//       });
+//
+//       const completionText = completion.data.choices[0].message.content;
+//       const recipes = completionText.split('\n').filter(recipe => recipe.trim() !== '');
+//       res.render('search', { recipes: recipes });
+//     } catch (error) {
+//       console.log(error);
+//       res.status(500).send('Error retrieving recipes.');
+//     }
+//   });
+
+
+
+
 
   app.get('/recipe/:name', async (req, res) => {
     const recipeName = req.params.name;
@@ -129,9 +134,6 @@ app.get('/', async (req, res) => {
     }
   });
   
-
-
-
 
 
 /* secret information section */
@@ -197,10 +199,6 @@ function adminAuthorization(req, res, next) {
     }
 }
 
-
-app.get('/', (req, res) => {
-    res.render("main");
-});
 
 
 app.get('/nosql-injection', async (req, res) => {
@@ -369,13 +367,6 @@ app.get('/logout', (req, res) => {
 });
 
 
-// app.get('/cat/:id', (req,res) => {
-//     var cat = req.params.id;
-
-//     res.render("cat", {cat: cat});
-// });
-
-
 app.get('/admin', sessionValidation, adminAuthorization, async (req, res) => {
     const result = await userCollection.find().project({username: 1, email: 1, user_type: 1}).toArray();
 
@@ -397,9 +388,31 @@ app.get('/admin', sessionValidation, adminAuthorization, async (req, res) => {
 app.get('/members', async (req, res) => {
     if (req.session.authenticated) {
         try {
-            const result = await userCollection.find({email: req.session.email}).project({username: 1}).toArray();
-            // res.render("members", {username: result[0].username});
-            res.render("index");
+            const ingredient = req.query.ingredient;
+
+            if (!ingredient) {
+                res.render('index', { recipes: [] });
+                return;
+            }
+
+            const messages = [
+                { role: 'system', content: 'You are a helpful assistant that suggests recipes based on given ingredients.' },
+                { role: 'user', content: `Give me some recipes with ${ingredient}.` },
+            ];
+
+            try {
+                const completion = await openai.createChatCompletion({
+                    model: 'gpt-3.5-turbo',
+                    messages: messages,
+                });
+
+                const completionText = completion.data.choices[0].message.content;
+                const recipes = completionText.split('\n').filter(recipe => recipe.trim() !== '');
+                res.render('search', { recipes: recipes });
+            } catch (error) {
+                console.log(error);
+                res.status(500).send('Error retrieving recipes.');
+            }
             return;
         } catch (error) {
             console.log(error);
