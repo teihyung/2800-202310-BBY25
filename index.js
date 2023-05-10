@@ -333,21 +333,29 @@ app.get('/members', async (req,res) => {
 
   app.get('/bookmarks', sessionValidation, async (req, res) => {
     if (req.session.authenticated) {
-      try {
-        const userId = req.session.userId; 
+    //   try {
+    //     const userId = req.session.userId; 
   
-        const bookmarks = await database.db(mongodb_database).collection('bookmarks').find({ userId }).toArray();
+    //     const bookmarks = await database.db(mongodb_database).collection('bookmarks').find({ userId }).toArray();
   
-        res.status(200).json(bookmarks);
-      } catch (error) {
-        console.log(error);
-        res.status(500).send('Internal server error');
-      }
+    //     res.status(200).json(bookmarks);
+    //   } catch (error) {
+    //     console.log(error);
+    //     res.status(500).send('Internal server error');
+    //   }
+        res.render("bookmarks")
     } else {
       res.status(401).send('Unauthorized');
     }
   });
   
+  app.get('/ingredientsList', sessionValidation, async (req, res) => {
+    if (req.session.authenticated) {
+        res.render("ingredientsList")
+    } else {
+      res.status(401).send('Unauthorized');
+    }
+  });
 
 app.use(express.static(__dirname + "/public"));
 
