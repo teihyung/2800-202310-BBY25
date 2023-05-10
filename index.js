@@ -19,6 +19,74 @@ const { ObjectId } = require('mongodb');
 
 const expireTime = 1 * 60 * 60 * 1000; //expires after 1 day  (hours * minutes * seconds * millis)
 
+
+const { Configuration, OpenAIApi } = require('openai');
+require('dotenv').config();
+
+const openaiConfiguration = new Configuration({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+const openai = new OpenAIApi(openaiConfiguration);
+
+app.get('/', async (req, res) => {
+    const ingredient = req.query.ingredient;
+  
+    if (!ingredient) {
+      res.render('search', { recipes: [] });
+      return;
+    }
+  
+    const messages = [
+      { role: 'system', content: 'You are a helpful assistant that suggests recipes based on given ingredients.' },
+      { role: 'user', content: `Give me some recipes with ${ingredient}.` },
+    ];
+  
+    try {
+      const completion = await openai.createChatCompletion({
+        model: 'gpt-3.5-turbo',
+        messages: messages,
+      });
+  
+      const completionText = completion.data.choices[0].message.content;
+      const recipes = completionText.split('\n').filter(recipe => recipe.trim() !== '');
+      res.render('search', { recipes: recipes });
+    } catch (error) {
+      console.log(error);
+      res.status(500).send('Error retrieving recipes.');
+    }
+  });
+  
+  
+  
+  
+
+  app.get('/recipe/:name', async (req, res) => {
+    const recipeName = req.params.name;
+  
+    const messages = [
+      { role: 'system', content: 'You are a helpful assistant that provides detailed instructions for a given recipe.' },
+      { role: 'user', content: `How do I make ${recipeName}?` },
+    ];
+  
+    try {
+      const completion = await openai.createChatCompletion({
+        model: 'gpt-3.5-turbo',
+        messages: messages,
+      });
+  
+      const completionText = completion.data.choices[0].message.content;
+      res.render('recipe', { name: recipeName, instructions: completionText });
+    } catch (error) {
+      console.log(error);
+      res.status(500).send('Error retrieving recipe instructions.');
+    }
+  });
+  
+
+
+
+
+
 /* secret information section */
 const mongodb_host = process.env.MONGODB_HOST;
 const mongodb_user = process.env.MONGODB_USER;
@@ -84,9 +152,7 @@ function adminAuthorization(req, res, next) {
     }
 }
 
-app.get('/', (req,res) => {
-    res.render("index");
-});
+
 
 app.get('/nosql-injection', async (req,res) => {
 	var username = req.query.user;
