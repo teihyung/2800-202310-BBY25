@@ -559,7 +559,7 @@ app.post('/bookmarks/add', sessionValidation, async (req, res) => {
 })
 
 app.get('/change_password', (req, res) => {
-    if(req.session.forgotPassword){
+    if(!req.session.forgotPassword){
         // User not authorized, redirect to an error page or appropriate route
         return res.redirect('/error');
     }
@@ -573,7 +573,7 @@ app.post('/change_password', async (req, res) => {
     if (password === confirmPassword) {
         // Passwords match
         await updatePassword(email, password); // Replace 'updatePassword' with your function to update the password in the database
-
+        req.session.destroy(); // Destroy the session so that the user can login again
         // Redirect the user to the login page or any other appropriate page
         res.redirect('/login');
     } else {
