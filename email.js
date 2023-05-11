@@ -3,11 +3,15 @@ require('dotenv').config();
 const nodeMailer = require('nodemailer');
 const {createTransport} = require("nodemailer");
 
-const html = `<h1>Hi</h1>
-    <p>Thank you for subscribing</p>
-`;
 
-async function main(){
+
+async function sendResetPasswordEmail(email, code) {
+
+    const html = `
+    <h1>Reset Your Password</h1>
+    <p>Please put your code in the website:</p>
+    <h3>${code}</h3>
+`;
 
     const transporter = nodeMailer.createTransport({
         host: 'smtp.gmail.com',
@@ -21,12 +25,12 @@ async function main(){
 
     const info = await transporter.sendMail({
         from: `"Kitchen Genie" <kitchengenievancouver@gmail.com>`,
-        to: `teihyung@gmail.com`,
-        subject: `Welcome to Kitchen Genie`,
+        to: email,
+        subject: `Reset Your Password`,
         html: html,
-    })
+    });
 
     console.log("Message sent: %s", info.messageId);
 }
 
-main().catch(e=>console.log(e));
+module.exports = sendResetPasswordEmail;

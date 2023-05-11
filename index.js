@@ -1,6 +1,8 @@
 require("./utils.js");
 
 require('dotenv').config();
+
+const sendResetPasswordEmail = require('./email.js');
 const express = require('express');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
@@ -121,6 +123,20 @@ app.use(session({
         resave: true
     }
 ));
+
+
+async function saveResetCode(email, code) {
+    // Update the user's document in MongoDB with the reset code
+    await userCollection.updateOne(
+        { email: email },
+        { $set: { resetCode: code } }
+    );
+}
+
+function generateRandomCode() {
+     // Generate a random 6-digit number
+    return Math.floor(100000 + Math.random() * 900000);
+}
 
 function isValidSession(req) {
     if (req.session.authenticated) {
@@ -298,6 +314,11 @@ app.post('/loggingin', async (req, res) => {
     }
 });
 
+app.get('/logout', (req, res) => {
+    req.session.destroy();
+    res.render("logout");
+});
+
 app.get('/wrongPw', (req, res) => {
     res.render("wrongPw");
 });
@@ -325,11 +346,18 @@ app.post('/forgot-password', async (req, res) => {
     const user = await findUserByEmail(email);
 
     if (user) {
+        const code = generateRandomCode();
+
+        req.session.email = email;
+
+        await sendResetPasswordEmail(email,code);
+
+        await saveResetCode(email, code);
         // User exists, proceed with password reset logic
         // Generate and save a password reset token or code (optional)
         // Send a password reset email to the user (optional)
         // Redirect the user to a password reset form or page
-        res.redirect('/reset-password');
+        res.render('reset-password',{email});
     } else {
         // User does not exist, display an error message or handle as desired
         const error = 'User not found';
@@ -338,10 +366,37 @@ app.post('/forgot-password', async (req, res) => {
     }
 });
 
-app.get('/logout', (req, res) => {
-    req.session.destroy();
-    res.render("logout");
+app.get('/reset-password', (req, res) => {
+    res.render("reset-password");
 });
+
+app.post('/reset-password', async (req, res) => {
+    const { email, code } = req.body;
+    console.log('Email:', email);
+    console.log('Code:', code);
+
+    // Check if the user exists in the database
+    const user = await findUserByEmail(req.session.email);
+    user.resetCode = code;
+
+    // console.log('Entered code:', code);
+    // console.log('Saved reset code:', user.resetCode);
+
+    if (user && user.resetCode === code) {
+        // User exists and the entered code matches the saved reset code
+        res.redirect('/change_password');
+    } else {
+        // Invalid code or user not found
+        const error = 'Invalid code';
+        console.log('Error:', error);
+        res.render('reset-password', { email, error });
+    }
+});
+
+app.get('/change_password', (req, res) => {
+    res.render('change_password');
+});
+
 
 
 app.get('/admin', sessionValidation, adminAuthorization, async (req, res) => {
