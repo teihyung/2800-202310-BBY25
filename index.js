@@ -1,6 +1,8 @@
 require("./utils.js");
 
 require('dotenv').config();
+
+const sendResetPasswordEmail = require('./email.js');
 const express = require('express');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
@@ -23,6 +25,7 @@ const expireTime = 1 * 60 * 60 * 1000; //expires after 1 day  (hours * minutes *
 
 
 const { Configuration, OpenAIApi } = require('openai');
+const {findUserByEmail} = require("./user");
 require('dotenv').config();
 
 const openaiConfiguration = new Configuration({
@@ -123,6 +126,30 @@ app.use(session({
         resave: true
     }
 ));
+
+
+async function saveResetCode(email, code) {
+    // Update the user's document in MongoDB with the reset code
+    await userCollection.updateOne(
+        { email: email },
+        { $set: { resetCode: code } }
+    );
+}
+
+async function updatePassword(email, password) {
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    // Update the user's document in MongoDB with the new password
+    await userCollection.updateOne(
+        { email: email },
+        { $set: { password: hashedPassword } }
+    );
+}
+
+function generateRandomCode() {
+     // Generate a random 6-digit number
+    return Math.floor(100000 + Math.random() * 900000);
+}
 
 function isValidSession(req) {
     if (req.session.authenticated) {
@@ -307,6 +334,12 @@ app.post('/loggingin', async (req, res) => {
     }
 });
 
+app.get('/logout', (req, res) => {
+    req.session.destroy();
+    req.session.email = null;
+    res.render("logout");
+});
+
 app.get('/wrongPw', (req, res) => {
     res.render("wrongPw");
 });
@@ -323,9 +356,67 @@ app.get('/loggedin/info', (req, res) => {
     res.render("loggedin-info");
 });
 
-app.get('/logout', (req, res) => {
-    req.session.destroy();
-    res.render("logout");
+app.get('/forgot-password', (req, res) => {
+    req.session.forgotPassword = true;
+    res.render("forgot-password");
+});
+
+app.post('/forgot-password', async (req, res) => {
+    const { email } = req.body;
+
+    // Check if the user exists in the database
+    const user = await findUserByEmail(email);
+
+    if (user) {
+        const code = generateRandomCode();
+
+        req.session.email = email;
+
+        await sendResetPasswordEmail(email,code);
+
+        await saveResetCode(email, code);
+        // User exists, proceed with password reset logic
+        // Generate and save a password reset token or code (optional)
+        // Send a password reset email to the user (optional)
+        // Redirect the user to a password reset form or page
+        res.render('reset-password',{email});
+    } else {
+        // User does not exist, display an error message or handle as desired
+        const error = 'User not found';
+        console.log('Error:', error);
+        res.render('forgot-password', { error: 'User not found' });
+    }
+});
+
+app.get('/reset-password', (req, res) => {
+    if (req.session.forgotPassword) {
+        // User not authorized, redirect to an error page or appropriate route
+        return res.redirect('/error');
+    }
+    res.render("reset-password");
+});
+
+app.post('/reset-password', async (req, res) => {
+    const { email, code } = req.body;
+    // console.log('Email:', email);
+    // console.log('Code:', code);
+
+    // Check if the user exists in the database
+    const user = await findUserByEmail(req.session.email);
+    user.resetCode = code;
+
+    // console.log('Entered code:', code);
+    // console.log('Saved reset code:', user.resetCode);
+
+    if (user && user.resetCode === code) {
+        // User exists and the entered code matches the saved reset code
+        res.redirect('/change_password');
+    } else {
+        // Invalid code or user not found
+        const error = 'Invalid code';
+        console.log('Error:', error);
+        res.render('reset-password', { email, error });
+    }
 });
 
 
@@ -468,6 +559,31 @@ app.post('/bookmarks/add', sessionValidation, async (req, res) => {
     }
 })
 
+app.get('/change_password', (req, res) => {
+    if(req.session.forgotPassword){
+        // User not authorized, redirect to an error page or appropriate route
+        return res.redirect('/error');
+    }
+    res.render('change_password');
+});
+
+app.post('/change_password', async (req, res) => {
+    const { password, confirmPassword } = req.body;
+    const email = req.session.email;
+
+    if (password === confirmPassword) {
+        // Passwords match
+        await updatePassword(email, password); // Replace 'updatePassword' with your function to update the password in the database
+
+        // Redirect the user to the login page or any other appropriate page
+        res.redirect('/login');
+    } else {
+        // Passwords do not match
+        const error = 'Passwords do not match';
+        console.log('Error:', error);
+        res.render('change_password', { error });
+    }
+});
 app.get('/bookmarks', sessionValidation, async (req, res) => {
     if (req.session.authenticated) {
     //   try {
