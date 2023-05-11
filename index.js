@@ -15,7 +15,55 @@ const app = express();
 
 const Joi = require("joi");
 
-const {ObjectId} = require('mongodb');
+const fs = require('fs');
+const path = require('path');
+
+const crypto = require('crypto');
+const ejs = require('ejs');
+
+const dotenv = require('dotenv');
+dotenv.config();
+
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
+
+
+
+let emailjs;
+import('emailjs').then((module) => {
+  emailjs = module;
+});
+
+
+
+const passwordReset = require('./passwordReset.js');
+
+
+
+
+
+
+
+
+app.get('/forgot-password', (req, res) => {
+    if (passwordReset) {
+      passwordReset.forgotPassword(req, res);
+    } else {
+      res.status(500).send("The password reset module is not available.");
+    }
+  });
+  
+  app.post('/forgot-password', (req, res) => {
+    if (passwordReset && emailjs) {
+      passwordReset.resetPassword(req, res, emailjs);
+    } else {
+      res.status(500).send("The password reset module or emailjs is not available.");
+    }
+  });
+  
+
+
+const { ObjectId } = require('mongodb');
 
 app.use(express.json());  // This line is important
 
@@ -613,6 +661,9 @@ app.get("*", (req, res) => {
     res.status(404);
     res.render("404");
 })
+
+
+
 
 app.listen(port, () => {
     console.log("Node application listening on port " + port);
