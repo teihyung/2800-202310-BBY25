@@ -20,6 +20,7 @@ const expireTime = 1 * 60 * 60 * 1000; //expires after 1 day  (hours * minutes *
 
 
 const { Configuration, OpenAIApi } = require('openai');
+const {findUserByEmail} = require("./user");
 require('dotenv').config();
 
 const openaiConfiguration = new Configuration({
@@ -311,6 +312,30 @@ app.get('/loggedin', (req, res) => {
 
 app.get('/loggedin/info', (req, res) => {
     res.render("loggedin-info");
+});
+
+app.get('/forgot-password', (req, res) => {
+    res.render("forgot-password");
+});
+
+app.post('/forgot-password', async (req, res) => {
+    const { email } = req.body;
+
+    // Check if the user exists in the database
+    const user = await findUserByEmail(email);
+
+    if (user) {
+        // User exists, proceed with password reset logic
+        // Generate and save a password reset token or code (optional)
+        // Send a password reset email to the user (optional)
+        // Redirect the user to a password reset form or page
+        res.redirect('/reset-password');
+    } else {
+        // User does not exist, display an error message or handle as desired
+        const error = 'User not found';
+        console.log('Error:', error);
+        res.render('forgot-password', { error: 'User not found' });
+    }
 });
 
 app.get('/logout', (req, res) => {
