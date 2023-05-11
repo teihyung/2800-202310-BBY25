@@ -1,9 +1,42 @@
 <%- include("templates/header") %>
 
 <div class="container mt-4">
-  <h1 class="mb-4"><%= name %></h1>
+  <h1 class="mb-4">
+    <%= name %>
+    <div class="d-flex flex-column bd-highlight mb-3 justify-content-between">
+      <a href="#" class="bookmark-icon <% if (isBookmarked) { %>bookmarked<% } %>">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          fill="currentColor"
+          class="bi bi-bookmark <% if (isBookmarked) { %>bi-bookmark-fill<% } %>"
+          viewBox="0 0 16 16"
+        >
+          <path
+            <% if (isBookmarked) { %>
+              d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5V2zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1H4z"
+            <% } else { %>
+              d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.5.5h-12a.5.5 0 0 1-.5-.5V2zm1-1a1 1 0 0 0-1 1v13.051l4.723-2.482a.5.5 0 0 1 .554 0L13 14.05V2a1 1 0 0 0-1-1H3z"
+            <% } %>
+          />
+        </svg>
+      </a>
+    </div>
+  </h1>
   <h2>Instructions</h2>
   <p><%= instructions %></p>
 </div>
+
+<script>
+  const bookmarkIcon = document.querySelector('.bookmark-icon');
+  bookmarkIcon.addEventListener('click', function (event) {
+    event.preventDefault(); // Prevents the default behavior of the link
+
+    bookmarkIcon.classList.toggle('bookmarked');
+    const bookmarkIconSvg = bookmarkIcon.querySelector('svg');
+    bookmarkIconSvg.classList.toggle('bi-bookmark-fill');
+  });
+</script>
 
 <%- include("templates/footer") %>

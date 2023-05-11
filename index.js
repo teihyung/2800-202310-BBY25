@@ -63,29 +63,58 @@ app.get('/', (req, res) => {
 
 
 
+// this is original
+//   app.get('/recipe/:name', async (req, res) => {
+//     const recipeName = req.params.name;
+  
+//     const messages = [
+//       { role: 'system', content: 'You are a helpful assistant that provides detailed instructions for a given recipe.' },
+//       { role: 'user', content: `How do I make ${recipeName}?` },
+//     ];
+  
+//     try {
+//       const completion = await openai.createChatCompletion({
+//         model: 'gpt-3.5-turbo',
+//         messages: messages,
+//       });
+  
+//       const completionText = completion.data.choices[0].message.content;
+//       res.render('recipe', { name: recipeName, instructions: completionText });
+//     } catch (error) {
+//       console.log(error);
+//       res.status(500).send('Error retrieving recipe instructions.');
+//     }
+//   });
 
-  app.get('/recipe/:name', async (req, res) => {
-    const recipeName = req.params.name;
+// app.get('/recipe/:name', sessionValidation, async (req, res) => {
+//     const recipeName = req.params.name;
+//     let isBookmarked = false;
+
+//     const messages = [
+//         { role: 'system', content: 'You are a helpful assistant that provides detailed instructions for a given recipe.' },
+//         { role: 'user', content: `How do I make ${recipeName}?` },
+//     ];
+
+//     if (req.session.authenticated) {
+//         const user = await userCollection.findOne({ _id: req.session.userId });
+//         isBookmarked = user.bookmarks.includes(recipeName);
+//     }
+
+//     try {
+//         const completion = await openai.createChatCompletion({
+//             model: 'gpt-3.5-turbo',
+//             messages: messages,
+//         });
+
+//         const completionText = completion.data.choices[0].message.content;
+//         res.render('recipe', { name: recipeName, instructions: completionText, isBookmarked: isBookmarked });
+//     } catch (error) {
+//         console.log(error);
+//         res.status(500).send('Error retrieving recipe instructions.');
+//     }
+// });
   
-    const messages = [
-      { role: 'system', content: 'You are a helpful assistant that provides detailed instructions for a given recipe.' },
-      { role: 'user', content: `How do I make ${recipeName}?` },
-    ];
-  
-    try {
-      const completion = await openai.createChatCompletion({
-        model: 'gpt-3.5-turbo',
-        messages: messages,
-      });
-  
-      const completionText = completion.data.choices[0].message.content;
-      res.render('recipe', { name: recipeName, instructions: completionText });
-    } catch (error) {
-      console.log(error);
-      res.status(500).send('Error retrieving recipe instructions.');
-    }
-  });
-  
+
 
 
 /* secret information section */
@@ -225,7 +254,10 @@ app.post('/submitUser', async (req, res) => {
     var email = req.body.email;
     var username = req.body.username;
     var password = req.body.password;
+    console.log("it worked1");
 
+
+    // const bookmarks = []; // Create an empty array for bookmarks
 
     const schema = Joi.object(
         {
@@ -243,7 +275,7 @@ app.post('/submitUser', async (req, res) => {
 
     var hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    await userCollection.insertOne({email: email, username: username, password: hashedPassword, user_type: "user"});
+    await userCollection.insertOne({email: email, username: username, password: hashedPassword, user_type: "user", bookmarks:[]});
     console.log("Inserted user");
 
     req.session.authenticated = true;
@@ -396,46 +428,68 @@ app.get('/profile', async (req, res) => {
     }
 });
 
-app.post('/bookmarks/add', sessionValidation, async (req, res) => {
-    if (req.session.authenticated) {
-        try {
-            const {title, url} = req.body;   // ???
-            const userId = req.session.userId;
-
-            await database.db(mongodb_database).collection('bookmarks').insertOne({
-                    username: username,
-                    title: title,
-                    url: url
-                }
-            );
-            console.log("Inserted user");
-
-
-            res.status(200).send('Bookmark added successfully');
-        } catch (error) {
-            console.log(error);
-            res.status(500).send('Internal server error');
-        }
-    } else {
-        res.status(401).send('Unauthorized');
+app.post('/bookmarks', async (req, res) => {
+    if (!req.session.authenticated) {
+        return res.status(403).send('Not authenticated');
     }
-})
+
+    try {
+        const {recipeName} = req.body;
+        
+        
+        // Add the bookmark
+        await userCollection.updateOne(
+            { _id: req.session.userId },
+            { $addToSet: { bookmarks: recipeName } } // $addToSet only adds if the recipe isn't already in the array
+        );
+
+        res.status(200).send('Bookmarked');
+    } catch (error) {
+        console.log(error);
+        res.status(500).send('Error bookmarking recipe');
+    }
+});
 
 app.get('/bookmarks', sessionValidation, async (req, res) => {
     if (req.session.authenticated) {
-    //   try {
-    //     const userId = req.session.userId; 
+      try {
+        const user = await userCollection.findOne({ email: req.session.email });
   
-    //     const bookmarks = await database.db(mongodb_database).collection('bookmarks').find({ userId }).toArray();
+        if (!user) {
+          return res.status(404).send('User not found');
+        }
   
-    //     res.status(200).json(bookmarks);
-    //   } catch (error) {
-    //     console.log(error);
-    //     res.status(500).send('Internal server error');
-    //   }
-        res.render("bookmarks")
+        // Assuming bookmarks are stored as an array of strings (recipe names)
+        const bookmarks = user.bookmarks || [];
+  
+        res.status(200).json(bookmarks);
+      } catch (error) {
+        console.log(error);
+        res.status(500).send('Internal server error');
+      }
     } else {
       res.status(401).send('Unauthorized');
+    }
+  });
+
+  app.delete('/bookmarks', async (req, res) => {
+    if (!req.session.authenticated) {
+      return res.status(403).send('Not authenticated');
+    }
+  
+    try {
+      const { recipeName } = req.body;
+  
+      // Remove the bookmark
+      await userCollection.updateOne(
+        { email: req.session.email },
+        { $pull: { bookmarks: recipeName } }
+      );
+  
+      res.status(200).send('Unbookmarked');
+    } catch (error) {
+      console.log(error);
+      res.status(500).send('Error unbookmarking recipe');
     }
   });
   
@@ -446,6 +500,36 @@ app.get('/bookmarks', sessionValidation, async (req, res) => {
       res.status(401).send('Unauthorized');
     }
   });
+
+  app.get('/recipe/:name', sessionValidation, async (req, res) => {
+    const recipeName = req.params.name;
+    let isBookmarked = false;
+
+    const messages = [
+        { role: 'system', content: 'You are a helpful assistant that provides detailed instructions for a given recipe.' },
+        { role: 'user', content: `How do I make ${recipeName}?` },
+    ];
+
+    if (req.session.authenticated) {
+        const user = await userCollection.findOne({ _id: req.session.userId });
+        if (user && user.bookmarks) {
+            isBookmarked = user.bookmarks.includes(recipeName);
+        }
+    }
+
+    try {
+        const completion = await openai.createChatCompletion({
+            model: 'gpt-3.5-turbo',
+            messages: messages,
+        });
+
+        const completionText = completion.data.choices[0].message.content;
+        res.render('recipe', { name: recipeName, instructions: completionText, isBookmarked: isBookmarked });
+    } catch (error) {
+        console.log(error);
+        res.status(500).send('Error retrieving recipe instructions.');
+    }
+});
 
 app.use(express.static(__dirname + "/public"));
 
