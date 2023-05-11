@@ -1,0 +1,186 @@
+<%- include("templates/header") %>
+
+<style>
+  .form-control:focus {
+    box-shadow: none;
+    border-color: #BA68C8;
+  }
+
+  .profile-button {
+    background: rgb(99, 39, 120);
+    box-shadow: none;
+    border: none;
+  }
+
+  .profile-button:hover {
+    background: #682773;
+  }
+
+  .profile-button:focus {
+    background: #682773;
+    box-shadow: none;
+  }
+
+  .profile-button:active {
+    background: #682773;
+    box-shadow: none;
+  }
+
+  .back:hover {
+    color: #682773;
+    cursor: pointer;
+  }
+
+  .labels {
+    font-size: 11px;
+  }
+
+  .add-experience:hover {
+    background: #BA68C8;
+    color: #fff;
+    cursor: pointer;
+    border: solid 1px #BA68C8;
+  }
+</style>
+
+<div class="container rounded bg-white mt-1 mb-1">
+  <div class="row">
+    <div class="col-md-3 border-right">
+      <div class="d-flex flex-column align-items-center text-center">
+        <img class="rounded-circle mt-1" width="150px"
+          src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg">
+        <span class="font-weight-bold"><%= username %></span>
+        <span class="text-black-50"><%= email %></span>
+        <span> </span>
+      </div>
+    </div>
+    <div class="col-md-9 border-right">
+      <div class="p-3">
+        <div class="d-flex justify-content-between align-items-center">
+          <h4 class="text-right">Profile Settings</h4>
+        </div>
+
+        <div class="container rounded bg-white mt-1 mb-1">
+
+        <div class="row mt-2">
+          <div class="col-md-6 py-2">
+            <label class="labels">User Name</label>
+            <input type="text" class="form-control" value="<%= username %>" readonly>
+          </div>
+          <div class="col-md-6 py-2">
+            <label class="labels">Email</label>
+            <input type="text" class="form-control" value="<%= email %>" readonly>
+          </div>
+          <div class="col-md-6 py-2">
+            <label class="labels">Password</label>
+            <input type="password" class="form-control" value="<%= password %>" readonly>
+          </div>
+          <div class="col-md-6 py-2">
+            <label class="labels">Status</label>
+            <!-- <select class="form-control" readonly>
+              <option value="Active">==========</option>
+
+              <option value="Active">Busy student</option>
+              <option value="Inactive">Home cook</option>
+              <option>Other</option> -->
+
+              <select name="status" class="form-control" onchange="handleStatusChange(this)">
+                <option value="Active">==========</option>
+                <option value="Busy student">Busy student</option>
+                <option value="Home cook">Home cook</option>
+                <option value="Food blogger">Food blogger</option>
+                <option value="Chef in training">Chef in training</option>
+                <option value="Meal prepper">Meal prepper</option>
+                <option value="Recipe developer">Recipe developer</option>
+                <option value="Culinary enthusiast">Culinary enthusiast</option>
+              
+                <option value="Other">Other</option> <!-- Option to enter a custom value -->
+              </select>
+              <input type="text" id="customStatusInput" name="customStatus" class="form-control mt-2" placeholder="Enter your status" style="display: none;">
+                            
+
+              <!-- Add more status options if needed -->
+            </select>
+          </div>
+          <div class="mt-3 text-center">
+            <!-- class="btn btn-primary rounded-pill px-3" -->
+
+            <button id="saveProfileButton" class="btn btn-primary rounded-pill px-3" type="button">Save Profile</button>
+          </div>
+        </div>
+        </div>
+
+        <div class="mt-3 text-center">
+          <button class="btn btn-primary profile-button" type="button"><a href="/logout" style="color: white; text-decoration: none;">Log out</a></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include("templates/footer") %>
+
+<script>
+  // Get references to the relevant elements
+  const saveProfileButton = document.getElementById('saveProfileButton');
+  const statusSelect = document.querySelector('select[name="status"]');
+  const customStatusInput = document.getElementById('customStatusInput');
+  
+  // Function to save the selected status in local storage
+  function saveSelectedStatus(status) {
+    localStorage.setItem('selectedStatus', status);
+  }
+  
+  // Function to retrieve the selected status from local storage
+  function getSelectedStatus() {
+    return localStorage.getItem('selectedStatus');
+  }
+  
+  // Update the status dropdown and customStatusInput when the page is loaded
+  window.addEventListener('DOMContentLoaded', (event) => {
+    // Assume status_user is a global variable containing the current status
+    const selectedStatus = getSelectedStatus();
+    if (selectedStatus === 'Other') {
+      customStatusInput.style.display = 'block';
+      customStatusInput.value = selectedStatus;
+    } else {
+      statusSelect.value = selectedStatus;
+    }
+  });
+  
+  // Add event listener to show/hide customStatusInput based on the value of statusSelect
+  statusSelect.addEventListener('change', function () {
+    if (this.value === 'Other') {
+      customStatusInput.style.display = 'block';
+    } else {
+      customStatusInput.style.display = 'none';
+    }
+  });
+  
+  // Add click event listener to the save button
+  saveProfileButton.addEventListener('click', function () {
+    const status = statusSelect.value;
+    const customStatus = status === 'Other' ? customStatusInput.value : '';
+  
+    // Save the selected status in local storage
+    saveSelectedStatus(status);
+  
+    // Send an AJAX request to save the profile
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', '/saveProfile', true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState === 4) {
+        if (xhr.status === 200) {
+          console.log('Profile saved successfully');
+          window.location.reload();
+        } else {
+          console.error('Failed to save profile');
+          alert('Failed to save profile. Please try again.');
+        }
+      }
+    };
+    xhr.send(JSON.stringify({ status, customStatus }));
+  });
+  
+  </script>
