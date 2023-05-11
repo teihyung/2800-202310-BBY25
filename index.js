@@ -336,7 +336,6 @@ app.post('/loggingin', async (req, res) => {
 
 app.get('/logout', (req, res) => {
     req.session.destroy();
-    req.session.email = null;
     res.render("logout");
 });
 
