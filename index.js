@@ -15,6 +15,9 @@ const Joi = require("joi");
 
 const {ObjectId} = require('mongodb');
 
+app.use(express.json());  // This line is important
+
+
 
 const expireTime = 1 * 60 * 60 * 1000; //expires after 1 day  (hours * minutes * seconds * millis)
 
@@ -225,6 +228,7 @@ app.post('/submitUser', async (req, res) => {
     var email = req.body.email;
     var username = req.body.username;
     var password = req.body.password;
+    var status_user = req.body.status;
 
 
     const schema = Joi.object(
@@ -243,7 +247,13 @@ app.post('/submitUser', async (req, res) => {
 
     var hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    await userCollection.insertOne({email: email, username: username, password: hashedPassword, user_type: "user"});
+    await userCollection.insertOne({
+        email: email, 
+        username: username, 
+        password: hashedPassword, 
+        user_type: "user",
+        status_user: status_user
+    });
     console.log("Inserted user");
 
     req.session.authenticated = true;
@@ -382,9 +392,18 @@ app.get('/profile', async (req, res) => {
             const result = await userCollection.find({email: req.session.email}).project({
                 username: 1,
                 email: 1,
-                password: 1
+                password: 1,
+                status_user: 1 
             }).toArray();
-            res.render("profile", {username: result[0].username, email: result[0].email, password: result[0].password});
+
+            const userData = {
+                username: result[0].username,
+                email: result[0].email,
+                password: result[0].password,
+                status_user: result[0].status_user // Assign the status_user field value
+            };
+
+            res.render("profile", userData);
             return;
         } catch (error) {
             console.log(error);
@@ -394,7 +413,35 @@ app.get('/profile', async (req, res) => {
         res.redirect('/login');
         return;
     }
+
 });
+
+    app.post('/saveProfile', async (req, res) => {
+    
+        if (req.session.authenticated) {
+          try {
+            const { status, customStatus } = req.body;
+            const userEmail = req.session.email;
+            console.log({ status, customStatus });
+    
+      
+            await userCollection.updateOne(
+              { email: userEmail },
+              { $set: { status_user: status === 'Other' ? customStatus : status } }
+            );
+      
+            res.sendStatus(200);
+          } catch (error) {
+            console.log(error);
+            res.sendStatus(500);
+          }
+        } else {
+          res.sendStatus(401);
+        }
+      });
+
+
+  
 
 app.post('/bookmarks/add', sessionValidation, async (req, res) => {
     if (req.session.authenticated) {
