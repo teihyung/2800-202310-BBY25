@@ -1,6 +1,8 @@
 require("./utils.js");
 
 require('dotenv').config();
+
+const sendResetPasswordEmail = require('./email.js');
 const express = require('express');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
@@ -63,11 +65,15 @@ app.get('/forgot-password', (req, res) => {
 
 const { ObjectId } = require('mongodb');
 
+app.use(express.json());  // This line is important
+
+
 
 const expireTime = 1 * 60 * 60 * 1000; //expires after 1 day  (hours * minutes * seconds * millis)
 
 
 const { Configuration, OpenAIApi } = require('openai');
+const {findUserByEmail} = require("./user");
 require('dotenv').config();
 
 const openaiConfiguration = new Configuration({
@@ -168,6 +174,30 @@ app.use(session({
         resave: true
     }
 ));
+
+
+async function saveResetCode(email, code) {
+    // Update the user's document in MongoDB with the reset code
+    await userCollection.updateOne(
+        { email: email },
+        { $set: { resetCode: code } }
+    );
+}
+
+async function updatePassword(email, password) {
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    // Update the user's document in MongoDB with the new password
+    await userCollection.updateOne(
+        { email: email },
+        { $set: { password: hashedPassword } }
+    );
+}
+
+function generateRandomCode() {
+     // Generate a random 6-digit number
+    return Math.floor(100000 + Math.random() * 900000);
+}
 
 function isValidSession(req) {
     if (req.session.authenticated) {
@@ -273,6 +303,7 @@ app.post('/submitUser', async (req, res) => {
     var email = req.body.email;
     var username = req.body.username;
     var password = req.body.password;
+    var status_user = req.body.status;
 
 
     const schema = Joi.object(
@@ -291,7 +322,13 @@ app.post('/submitUser', async (req, res) => {
 
     var hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    await userCollection.insertOne({email: email, username: username, password: hashedPassword, user_type: "user"});
+    await userCollection.insertOne({
+        email: email, 
+        username: username, 
+        password: hashedPassword, 
+        user_type: "user",
+        status_user: status_user
+    });
     console.log("Inserted user");
 
     req.session.authenticated = true;
@@ -338,11 +375,14 @@ app.post('/loggingin', async (req, res) => {
         return;
     } else {
         console.log("incorrect password");
-        var errorMsg = "Incorrect email or password.";
-        errorMsg += "<a href='/login'>try again</a>";
-        res.send(errorMsg);
+        res.redirect('/wrongPw');
         return;
     }
+});
+
+app.get('/logout', (req, res) => {
+    req.session.destroy();
+    res.render("logout");
 });
 
 app.get('/wrongPw', (req, res) => {
@@ -361,9 +401,67 @@ app.get('/loggedin/info', (req, res) => {
     res.render("loggedin-info");
 });
 
-app.get('/logout', (req, res) => {
-    req.session.destroy();
-    res.render("logout");
+app.get('/forgot-password', (req, res) => {
+    req.session.forgotPassword = true;
+    res.render("forgot-password");
+});
+
+app.post('/forgot-password', async (req, res) => {
+    const { email } = req.body;
+
+    // Check if the user exists in the database
+    const user = await findUserByEmail(email);
+
+    if (user) {
+        const code = generateRandomCode();
+
+        req.session.email = email;
+
+        await sendResetPasswordEmail(email,code);
+
+        await saveResetCode(email, code);
+        // User exists, proceed with password reset logic
+        // Generate and save a password reset token or code (optional)
+        // Send a password reset email to the user (optional)
+        // Redirect the user to a password reset form or page
+        res.render('reset-password',{email});
+    } else {
+        // User does not exist, display an error message or handle as desired
+        const error = 'User not found';
+        console.log('Error:', error);
+        res.render('forgot-password', { error: 'User not found' });
+    }
+});
+
+app.get('/reset-password', (req, res) => {
+    if (req.session.forgotPassword) {
+        // User not authorized, redirect to an error page or appropriate route
+        return res.redirect('/error');
+    }
+    res.render("reset-password");
+});
+
+app.post('/reset-password', async (req, res) => {
+    const { email, code } = req.body;
+    // console.log('Email:', email);
+    // console.log('Code:', code);
+
+    // Check if the user exists in the database
+    const user = await findUserByEmail(req.session.email);
+    user.resetCode = code;
+
+    // console.log('Entered code:', code);
+    // console.log('Saved reset code:', user.resetCode);
+
+    if (user && user.resetCode === code) {
+        // User exists and the entered code matches the saved reset code
+        res.redirect('/change_password');
+    } else {
+        // Invalid code or user not found
+        const error = 'Invalid code';
+        console.log('Error:', error);
+        res.render('reset-password', { email, error });
+    }
 });
 
 
@@ -430,9 +528,18 @@ app.get('/profile', async (req, res) => {
             const result = await userCollection.find({email: req.session.email}).project({
                 username: 1,
                 email: 1,
-                password: 1
+                password: 1,
+                status_user: 1 
             }).toArray();
-            res.render("profile", {username: result[0].username, email: result[0].email, password: result[0].password});
+
+            const userData = {
+                username: result[0].username,
+                email: result[0].email,
+                password: result[0].password,
+                status_user: result[0].status_user // Assign the status_user field value
+            };
+
+            res.render("profile", userData);
             return;
         } catch (error) {
             console.log(error);
@@ -442,7 +549,35 @@ app.get('/profile', async (req, res) => {
         res.redirect('/login');
         return;
     }
+
 });
+
+    app.post('/saveProfile', async (req, res) => {
+    
+        if (req.session.authenticated) {
+          try {
+            const { status, customStatus } = req.body;
+            const userEmail = req.session.email;
+            console.log({ status, customStatus });
+    
+      
+            await userCollection.updateOne(
+              { email: userEmail },
+              { $set: { status_user: status === 'Other' ? customStatus : status } }
+            );
+      
+            res.sendStatus(200);
+          } catch (error) {
+            console.log(error);
+            res.sendStatus(500);
+          }
+        } else {
+          res.sendStatus(401);
+        }
+      });
+
+
+  
 
 app.post('/bookmarks/add', sessionValidation, async (req, res) => {
     if (req.session.authenticated) {
@@ -469,6 +604,31 @@ app.post('/bookmarks/add', sessionValidation, async (req, res) => {
     }
 })
 
+app.get('/change_password', (req, res) => {
+    if(!req.session.forgotPassword){
+        // User not authorized, redirect to an error page or appropriate route
+        return res.redirect('/error');
+    }
+    res.render('change_password');
+});
+
+app.post('/change_password', async (req, res) => {
+    const { password, confirmPassword } = req.body;
+    const email = req.session.email;
+
+    if (password === confirmPassword) {
+        // Passwords match
+        await updatePassword(email, password); // Replace 'updatePassword' with your function to update the password in the database
+        req.session.destroy(); // Destroy the session so that the user can login again
+        // Redirect the user to the login page or any other appropriate page
+        res.redirect('/login');
+    } else {
+        // Passwords do not match
+        const error = 'Passwords do not match';
+        console.log('Error:', error);
+        res.render('change_password', { error });
+    }
+});
 app.get('/bookmarks', sessionValidation, async (req, res) => {
     if (req.session.authenticated) {
     //   try {

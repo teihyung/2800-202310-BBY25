@@ -4,6 +4,8 @@ const dotenv = require('dotenv');
 dotenv.config();
 const {database} = include('databaseConnection');
 
+
+
 const userCollection = database.db(process.env.MONGODB_DATABASE).collection('users');
 
 async function createUser(email, username, password) {
@@ -31,16 +33,13 @@ async function updateUserType(email, user_type) {
 
 async function updateUser(email, changes) {
     await userCollection.updateOne({ email: email }, { $set: changes });
-  }
-  
-  
-  module.exports = {
+}
+
+
+module.exports = {
     createUser,
     findUserByEmail,
     updateUserType,
     updateUser, // Add this line
-  };
-  
-  
-
+};
 

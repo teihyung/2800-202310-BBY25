@@ -1,19 +1,32 @@
 {
-  "name": "2800-202310-BBY25",
+  "name": "2800-202310-bby25",
   "version": "1.0.0",
   "dependencies": {
     "bcrypt": "^5.1.0",
     "connect-mongo": "^5.0.0",
     "dotenv": "^16.0.3",
     "ejs": "^3.1.9",
-    "emailjs": "^4.0.1",
-    "emailjs-com": "^3.2.0",
     "express": "^4.18.2",
     "express-session": "^1.17.3",
-    "googleapis": "^118.0.0",
     "joi": "^17.9.2",
-    "nodemailer": "^6.9.1",
+    "nodemailer": "^6.9.2",
     "openai": "^3.2.1",
     "readline-sync": "^1.4.10"
-  }
+  },
+  "description": "<br> This is our 2800 project github repository!</br>",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/teihyung/2800-202310-BBY25.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/teihyung/2800-202310-BBY25/issues"
+  },
+  "homepage": "https://github.com/teihyung/2800-202310-BBY25#readme"
 }
