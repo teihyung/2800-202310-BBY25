@@ -327,9 +327,7 @@ app.post('/loggingin', async (req, res) => {
         return;
     } else {
         console.log("incorrect password");
-        var errorMsg = "Incorrect email or password.";
-        errorMsg += "<a href='/login'>try again</a>";
-        res.send(errorMsg);
+        res.redirect('/wrongPw');
         return;
     }
 });
