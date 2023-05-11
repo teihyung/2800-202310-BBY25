@@ -1,23 +1,26 @@
 <%- include("templates/header") %> 
-    <main class="form-signin w-100 m-auto">
-        <div class="d-flex gap-2 justify-content-center py-5">
-        <form action="/signupSubmit" method="post" class="text-center">
-          <h1 class="h3 mb-3 fw-normal">Please sign up</h1>
-          <div class="form-floating">
-            <input name="username" type="text" class="form-control" id="floatingInput" placeholder="username">
-            <label for="floatingInput">Username</label>
-          </div>
-          <div class="form-floating">
-            <input name="email" type="email" class="form-control" id="floatingInput" placeholder="email">
-            <label for="floatingInput">Email address</label>
-          </div>
-          <div class="form-floating">
-            <input name='password' type="password" class="form-control" id="floatingPassword" placeholder="password">
-            <label for="floatingPassword">Password</label>
-          </div><br>
-    
-          <button class="w-100 btn btn-lg btn-primary">Submit</button>
-        </form>
+<main class="form-signin m-auto">
+  <div class="row justify-content-center py-5">
+    <div class="col-md-6">
+      <form action="/submitUser" method="post" class="text-center">
+        <h1 class="h3 mb-3 fw-normal">Please sign up</h1>
+        <div class="form-floating">
+          <input name="username" type="text" class="form-control" id="floatingInput" placeholder="username">
+          <label for="floatingInput">Username</label>
         </div>
-      </main>
+        <div class="form-floating">
+          <input name="email" type="email" class="form-control" id="floatingInput" placeholder="email">
+          <label for="floatingInput">Email address</label>
+        </div>
+        <div class="form-floating">
+          <input name='password' type="password" class="form-control" id="floatingPassword" placeholder="password">
+          <label for="floatingPassword">Password</label>
+        </div><br>
+    
+        <button class="w-100 btn btn-lg btn-primary">Submit</button>
+      </form>
+    </div>
+  </div>
+</main>
+
 <%- include("templates/footer") %> 
