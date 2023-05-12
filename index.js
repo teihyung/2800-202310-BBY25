@@ -292,6 +292,7 @@ app.post('/loggingin', async (req, res) => {
         req.session.authenticated = true;
         req.session.email = email;
         req.session.cookie.maxAge = expireTime;
+        req.session.username = username;
 
         res.redirect('/members');
         return;
@@ -433,18 +434,21 @@ function getRandomRecipes(data, count) {
     
   app.get('/members', async (req, res) => {
     if (req.session.authenticated) {
-        // console.log(req.session.email);
-        // console.log(req.session.username);
-        // console.log(req.session.user_type);
-
         try {    
               
            const ingredient = req.query.ingredient;
+
+           const result = await userCollection.find({email: req.session.email}).project({
+            username: 1}).toArray();
+
+        const userData = {
+            username: result[0].username
+        }
   
             if (!ingredient) {
                 try {
                     const randomRecipes = await getRandomRecipeSuggestions(); 
-                    res.render('index', { username: req.session.username, randomRecipes: randomRecipes });
+                    res.render('index', { userData, randomRecipes: randomRecipes });
                     console.log(req.session.username);
   
                 } catch (error) {
