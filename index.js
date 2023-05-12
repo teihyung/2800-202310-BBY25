@@ -81,6 +81,8 @@ const userCollection = database.db(mongodb_database).collection('users');
 app.set('view engine', 'ejs');
 
 app.use(express.urlencoded({extended: false}));
+app.use("/img", express.static("./img"));
+
 
 var mongoStore = MongoStore.create({
     mongoUrl: `mongodb+srv://${mongodb_user}:${mongodb_password}@${mongodb_host}/sessions`,
