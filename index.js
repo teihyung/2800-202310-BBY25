@@ -21,6 +21,8 @@ const Joi = require("joi");
 const {ObjectId} = require('mongodb');
 
 app.use(express.json());  // This line is important
+app.use("/img", express.static("./img"));
+
 
 
 
