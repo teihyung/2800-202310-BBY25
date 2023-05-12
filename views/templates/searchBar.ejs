@@ -14,3 +14,14 @@
     </button>
   </form>
 </div>
+  <!-- Add your loading spinner markup here -->
+  <div id="loading-spinner" style="display: none;">
+    <!-- Add your loading spinner markup here, e.g., an animated GIF or an SVG spinner -->
+</div>
+
+<!-- Add the script to handle showing the loading spinner -->
+<script>
+document.querySelector('form').addEventListener('submit', () => {
+    document.getElementById('loading-spinner').style.display = 'block';
+});
+</script>
