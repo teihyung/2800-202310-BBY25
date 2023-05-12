@@ -474,7 +474,7 @@ function getRandomRecipes(data, count) {
                 res.render('search', { recipes: recipes });
             } catch (error) {
                 console.log(error);
-                res.status(500).send('Error retrieving recipes.');
+                next(error); // Pass the error to the error handling middleware
             }
             return;
         } catch (error) {
@@ -487,6 +487,9 @@ function getRandomRecipes(data, count) {
         return;
     }
   });
+  app.use((error, req, res, next) => {
+    res.status(500).render('error', { error: error.message });
+});
 
 
 app.get('/profile', async (req, res) => {
