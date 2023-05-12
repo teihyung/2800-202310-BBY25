@@ -15,55 +15,7 @@ const app = express();
 
 const Joi = require("joi");
 
-const fs = require('fs');
-const path = require('path');
-
-const crypto = require('crypto');
-const ejs = require('ejs');
-
-const dotenv = require('dotenv');
-dotenv.config();
-
-app.use(express.urlencoded({ extended: false }));
-app.use(express.json());
-
-
-
-let emailjs;
-import('emailjs').then((module) => {
-  emailjs = module;
-});
-
-
-
-const passwordReset = require('./passwordReset.js');
-
-
-
-
-
-
-
-
-app.get('/forgot-password', (req, res) => {
-    if (passwordReset) {
-      passwordReset.forgotPassword(req, res);
-    } else {
-      res.status(500).send("The password reset module is not available.");
-    }
-  });
-  
-  app.post('/forgot-password', (req, res) => {
-    if (passwordReset && emailjs) {
-      passwordReset.resetPassword(req, res, emailjs);
-    } else {
-      res.status(500).send("The password reset module or emailjs is not available.");
-    }
-  });
-  
-
-
-const { ObjectId } = require('mongodb');
+const {ObjectId} = require('mongodb');
 
 app.use(express.json());  // This line is important
 
@@ -77,7 +29,7 @@ const {findUserByEmail} = require("./user");
 require('dotenv').config();
 
 const openaiConfiguration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
+    apiKey: process.env.OPENAI_API_KEY,
 });
 const openai = new OpenAIApi(openaiConfiguration);
 
@@ -118,28 +70,28 @@ app.get('/', (req, res) => {
 
 
 
-  app.get('/recipe/:name', async (req, res) => {
+app.get('/recipe/:name', async (req, res) => {
     const recipeName = req.params.name;
-  
+
     const messages = [
-      { role: 'system', content: 'You are a helpful assistant that provides detailed instructions for a given recipe.' },
-      { role: 'user', content: `How do I make ${recipeName}?` },
+        { role: 'system', content: 'You are a helpful assistant that provides detailed instructions for a given recipe.' },
+        { role: 'user', content: `How do I make ${recipeName}?` },
     ];
-  
+
     try {
-      const completion = await openai.createChatCompletion({
-        model: 'gpt-3.5-turbo',
-        messages: messages,
-      });
-  
-      const completionText = completion.data.choices[0].message.content;
-      res.render('recipe', { name: recipeName, instructions: completionText });
+        const completion = await openai.createChatCompletion({
+            model: 'gpt-3.5-turbo',
+            messages: messages,
+        });
+
+        const completionText = completion.data.choices[0].message.content;
+        res.render('recipe', { name: recipeName, instructions: completionText });
     } catch (error) {
-      console.log(error);
-      res.status(500).send('Error retrieving recipe instructions.');
+        console.log(error);
+        res.status(500).send('Error retrieving recipe instructions.');
     }
-  });
-  
+});
+
 
 
 /* secret information section */
@@ -195,7 +147,7 @@ async function updatePassword(email, password) {
 }
 
 function generateRandomCode() {
-     // Generate a random 6-digit number
+    // Generate a random 6-digit number
     return Math.floor(100000 + Math.random() * 900000);
 }
 
@@ -323,9 +275,9 @@ app.post('/submitUser', async (req, res) => {
     var hashedPassword = await bcrypt.hash(password, saltRounds);
 
     await userCollection.insertOne({
-        email: email, 
-        username: username, 
-        password: hashedPassword, 
+        email: email,
+        username: username,
+        password: hashedPassword,
         user_type: "user",
         status_user: status_user
     });
@@ -402,7 +354,6 @@ app.get('/loggedin/info', (req, res) => {
 });
 
 app.get('/forgot-password', (req, res) => {
-    req.session.forgotPassword = true;
     res.render("forgot-password");
 });
 
@@ -413,6 +364,7 @@ app.post('/forgot-password', async (req, res) => {
     const user = await findUserByEmail(email);
 
     if (user) {
+        req.session.forgotPassword = true;
         const code = generateRandomCode();
 
         req.session.email = email;
@@ -529,7 +481,7 @@ app.get('/profile', async (req, res) => {
                 username: 1,
                 email: 1,
                 password: 1,
-                status_user: 1 
+                status_user: 1
             }).toArray();
 
             const userData = {
@@ -552,32 +504,32 @@ app.get('/profile', async (req, res) => {
 
 });
 
-    app.post('/saveProfile', async (req, res) => {
-    
-        if (req.session.authenticated) {
-          try {
+app.post('/saveProfile', async (req, res) => {
+
+    if (req.session.authenticated) {
+        try {
             const { status, customStatus } = req.body;
             const userEmail = req.session.email;
             console.log({ status, customStatus });
-    
-      
+
+
             await userCollection.updateOne(
-              { email: userEmail },
-              { $set: { status_user: status === 'Other' ? customStatus : status } }
+                { email: userEmail },
+                { $set: { status_user: status === 'Other' ? customStatus : status } }
             );
-      
+
             res.sendStatus(200);
-          } catch (error) {
+        } catch (error) {
             console.log(error);
             res.sendStatus(500);
-          }
-        } else {
-          res.sendStatus(401);
         }
-      });
+    } else {
+        res.sendStatus(401);
+    }
+});
 
 
-  
+
 
 app.post('/bookmarks/add', sessionValidation, async (req, res) => {
     if (req.session.authenticated) {
@@ -631,29 +583,29 @@ app.post('/change_password', async (req, res) => {
 });
 app.get('/bookmarks', sessionValidation, async (req, res) => {
     if (req.session.authenticated) {
-    //   try {
-    //     const userId = req.session.userId; 
-  
-    //     const bookmarks = await database.db(mongodb_database).collection('bookmarks').find({ userId }).toArray();
-  
-    //     res.status(200).json(bookmarks);
-    //   } catch (error) {
-    //     console.log(error);
-    //     res.status(500).send('Internal server error');
-    //   }
+        //   try {
+        //     const userId = req.session.userId;
+
+        //     const bookmarks = await database.db(mongodb_database).collection('bookmarks').find({ userId }).toArray();
+
+        //     res.status(200).json(bookmarks);
+        //   } catch (error) {
+        //     console.log(error);
+        //     res.status(500).send('Internal server error');
+        //   }
         res.render("bookmarks")
     } else {
-      res.status(401).send('Unauthorized');
+        res.status(401).send('Unauthorized');
     }
-  });
-  
-  app.get('/ingredientsList', sessionValidation, async (req, res) => {
+});
+
+app.get('/ingredientsList', sessionValidation, async (req, res) => {
     if (req.session.authenticated) {
         res.render("ingredientsList")
     } else {
-      res.status(401).send('Unauthorized');
+        res.status(401).send('Unauthorized');
     }
-  });
+});
 
 app.use(express.static(__dirname + "/public"));
 
@@ -661,9 +613,6 @@ app.get("*", (req, res) => {
     res.status(404);
     res.render("404");
 })
-
-
-
 
 app.listen(port, () => {
     console.log("Node application listening on port " + port);
