@@ -1,7 +1,10 @@
+
 require("./utils.js");
 
 require('dotenv').config();
 
+const csv = require('csv-parser');
+const fs = require('fs');
 const sendResetPasswordEmail = require('./email.js');
 const express = require('express');
 const session = require('express-session');
@@ -36,39 +39,6 @@ const openai = new OpenAIApi(openaiConfiguration);
 app.get('/', (req, res) => {
     res.render("main");
 });
-
-// app.get('/members', async (req, res) => {
-//
-//     const ingredient = req.query.ingredient;
-//
-//     if (!ingredient) {
-//       res.render('index', { recipes: [] });
-//       return;
-//     }
-//
-//     const messages = [
-//       { role: 'system', content: 'You are a helpful assistant that suggests recipes based on given ingredients.' },
-//       { role: 'user', content: `Give me some recipes with ${ingredient}.` },
-//     ];
-//
-//     try {
-//       const completion = await openai.createChatCompletion({
-//         model: 'gpt-3.5-turbo',
-//         messages: messages,
-//       });
-//
-//       const completionText = completion.data.choices[0].message.content;
-//       const recipes = completionText.split('\n').filter(recipe => recipe.trim() !== '');
-//       res.render('search', { recipes: recipes });
-//     } catch (error) {
-//       console.log(error);
-//       res.status(500).send('Error retrieving recipes.');
-//     }
-//   });
-
-
-
-
 
 app.get('/recipe/:name', async (req, res) => {
     const recipeName = req.params.name;
@@ -322,6 +292,7 @@ app.post('/loggingin', async (req, res) => {
         req.session.authenticated = true;
         req.session.email = email;
         req.session.cookie.maxAge = expireTime;
+        req.session.username = username;
 
         res.redirect('/members');
         return;
@@ -435,27 +406,69 @@ app.get('/admin', sessionValidation, adminAuthorization, async (req, res) => {
     });
 });
 
-app.get('/members', async (req, res) => {
+function getRandomRecipes(data, count) {
+    const shuffledData = data.sort(() => 0.5 - Math.random());
+    return shuffledData.slice(0, count);
+  }
+  
+  
+  function getRandomRecipeSuggestions() {
+    return new Promise((resolve, reject) => {
+    const csvFilePath = 'dataset.csv';
+    const data = [];
+  
+    fs.createReadStream(csvFilePath)
+      .pipe(csv())
+      .on('data', (row) => {
+        data.push(row);
+      })
+      .on('end', () => {
+        const randomRecipes = getRandomRecipes(data, 5);
+        resolve(randomRecipes);
+      })
+      .on('error', (error) => {
+        reject(error);
+      });
+    })
+  }
+    
+  app.get('/members', async (req, res) => {
     if (req.session.authenticated) {
-        try {
-            const ingredient = req.query.ingredient;
+        try {    
+              
+           const ingredient = req.query.ingredient;
 
+           const result = await userCollection.find({email: req.session.email}).project({
+            username: 1}).toArray();
+
+        const userData = {
+            username: result[0].username
+        }
+  
             if (!ingredient) {
-                res.render('index', { recipes: [] });
+                try {
+                    const randomRecipes = await getRandomRecipeSuggestions(); 
+                    res.render('index', { userData, randomRecipes: randomRecipes });
+                    console.log(req.session.username);
+  
+                } catch (error) {
+                    console.error(error);
+                    res.status(500).send('Error retrieving random recipe suggestions.');
+                }
                 return;
-            }
-
+            }      
+  
             const messages = [
                 { role: 'system', content: 'You are a helpful assistant that suggests recipes based on given ingredients.' },
                 { role: 'user', content: `Give me some recipes with ${ingredient}.` },
             ];
-
+  
             try {
                 const completion = await openai.createChatCompletion({
                     model: 'gpt-3.5-turbo',
                     messages: messages,
                 });
-
+  
                 const completionText = completion.data.choices[0].message.content;
                 const recipes = completionText.split('\n').filter(recipe => recipe.trim() !== '');
                 res.render('search', { recipes: recipes });
@@ -468,11 +481,13 @@ app.get('/members', async (req, res) => {
             console.log(error);
             res.redirect('/login');
         }
+  
     } else {
         res.redirect('/login');
         return;
     }
-});
+  });
+
 
 app.get('/profile', async (req, res) => {
     if (req.session.authenticated) {
@@ -527,8 +542,6 @@ app.post('/saveProfile', async (req, res) => {
         res.sendStatus(401);
     }
 });
-
-
 
 
 app.post('/bookmarks/add', sessionValidation, async (req, res) => {
