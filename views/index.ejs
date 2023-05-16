@@ -15,7 +15,7 @@
       <% randomRecipes.forEach(function(recipe) { %>
         <div class="col-md-4 mb-3">
           <div class="card">
-            <!-- <img src="/path/to/images/<%= recipe.Image_Name %>" class="card-img-top" alt="Recipe Image"> -->
+            <img src="/img/food/<%= recipe.Image_Name %>.jpg" class="card-img-top" alt="<%= recipe.Image_Name %>">
             <div class="card-body d-flex flex-column">
               <h5 class="card-title"><%= recipe.Title %></h5>
               <!-- <h6>Ingredients</h6>
