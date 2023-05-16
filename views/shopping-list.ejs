@@ -1,0 +1,66 @@
+
+<%- include("templates/header") %>
+<style>
+  .shopping-list-container {
+  
+      background-image: url('/img/background.jpg');
+      background-size: cover;
+      background-repeat: no-repeat;
+      font-family: Arial, sans-serif;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 0 20px;
+      box-sizing: border-box;
+    }
+
+    h2 {
+      font-size: 28px;
+      margin-bottom: 20px;
+    }
+
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    li {
+      font-size: 18px;
+      line-height: 1.5;
+    }
+</style>
+
+<div class="shopping-list-container">
+  <h2><%= name %> Shopping List</h2>
+  <ul>
+    <% shoppingList.forEach(function(ingredient) { %>
+      <li><%= ingredient %></li>
+    <% }); %>
+  </ul>
+</div>
+<%- include("templates/footer") %>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

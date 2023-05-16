@@ -1,12 +1,51 @@
 <%- include("templates/header") %>
 
+<!-- Add Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
+<!-- Add custom CSS for background image and text -->
+<style>
+  body {
+    font-family: 'Roboto', sans-serif;
+    background-image: url('/img/background.jpg');
+    background-size: cover;
+    background-position: center;
+  }
+
+  .content-wrapper {
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 20px;
+    border-radius: 15px;
+  }
+
+  h2 {
+    font-weight: 700;
+  }
+
+  a {
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  
+  }
+</style>
+
 <!-- Add this inside your HTML body -->
 <div id="loading-spinner" style="display: none;">
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Loading...</span>
   <!-- Add your loading spinner markup here, e.g., an animated GIF or an SVG spinner -->
 </div>
+</div>
+<!-- Add this inside the head tag or right before the closing body tag -->
+<script src="/path/to/spinner.js"></script>
+
 
 <% if (recipes.length > 0) { %>
-    <div class="mt-5">
+  <div class="container mt-5">
+    <div class="content-wrapper">
       <h2>Recipes</h2>
       <ul class="list-group">
         <% recipes.forEach(function(recipe) { %>
@@ -16,7 +55,7 @@
         <% }); %>
       </ul>
     </div>
-  <% } %>
-</div>
+  </div>
+<% } %>
 
 <%- include("templates/footer") %>
