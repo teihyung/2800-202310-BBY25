@@ -82,10 +82,11 @@ app.use(session({
 
 
 async function saveResetCode(email, code) {
+    const expirationTime = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes from now
     // Update the user's document in MongoDB with the reset code
     await userCollection.updateOne(
         { email: email },
-        { $set: { resetCode: code } }
+        { $set: { resetCode: code, resetCodeExpiration: expirationTime } }
     );
 }
 
@@ -271,7 +272,7 @@ app.post('/loggingin', async (req, res) => {
     const result = await userCollection.find({email: email}).project({email: 1, password: 1, user_type: 1}).toArray();
     // const user = await userCollection.findOne({ username });
 
-    if (result.length != 1) {
+    if (result.length !== 1) {
         console.log("user not found");
         res.redirect("/wrongPw");
         return;
@@ -346,10 +347,19 @@ app.post('/forgot-password', async (req, res) => {
     }
 });
 
-app.get('/reset-password', (req, res) => {
+app.get('/reset-password', async (req, res) => {
     if (req.session.forgotPassword) {
         // User not authorized, redirect to an error page or appropriate route
         return res.redirect('/error');
+    }
+
+    const user = await findUserByEmail(req.session.email);
+
+    if (!user || user.resetCodeExpiration < new Date()) {
+        // Invalid or expired reset code
+        const error = 'Invalid or expired reset code';
+        console.log('Error:', error);
+        return res.render('reset-password', { error });
     }
     res.render("reset-password");
 });
@@ -362,11 +372,10 @@ app.post('/reset-password', async (req, res) => {
     // Check if the user exists in the database
     const user = await findUserByEmail(req.session.email);
     user.resetCode = code;
+    console.log(user.resetCodeExpiration);
+    console.log(new Date());
 
-    // console.log('Entered code:', code);
-    // console.log('Saved reset code:', user.resetCode);
-
-    if (user && user.resetCode === code) {
+    if (user && user.resetCode === code && user.resetCodeExpiration > new Date()) {
         // User exists and the entered code matches the saved reset code
         res.redirect('/change_password');
     } else {
@@ -406,7 +415,7 @@ function getRandomRecipes(data, count) {
     return new Promise((resolve, reject) => {
     const csvFilePath = 'dataset.csv';
     const data = [];
-  
+
     fs.createReadStream(csvFilePath)
       .pipe(csv())
       .on('data', (row) => {
@@ -747,19 +756,30 @@ app.post('/change_password', async (req, res) => {
     const { password, confirmPassword } = req.body;
     const email = req.session.email;
 
+    const user = await findUserByEmail(email);
+    const previousPassword = user.password;
+
     if (password === confirmPassword) {
+        const isSameOldPassword = await bcrypt.compare(password, previousPassword);
         // Passwords match
+        if (isSameOldPassword) {
+            // New password is the same as the previous password
+            const error = 'New password cannot be the same as the previous password';
+            console.log('Error:', error);
+            return res.render('change_password', { error });
+        }
         await updatePassword(email, password); // Replace 'updatePassword' with your function to update the password in the database
         req.session.destroy(); // Destroy the session so that the user can login again
         // Redirect the user to the login page or any other appropriate page
-        res.redirect('/login');
+        return res.render('login');
     } else {
         // Passwords do not match
         const error = 'Passwords do not match';
         console.log('Error:', error);
-        res.render('change_password', { error });
+        return res.render('change_password', { error });
     }
 });
+
 
 
 // app.post('/bookmarks', sessionValidation, async (req, res) => {
