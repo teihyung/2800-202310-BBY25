@@ -37,11 +37,15 @@
   <div class="content-wrapper">
     <h1 class="mb-4"><%= name %></h1>
     <h2>Shopping List</h2>
+
     <ul class="list-group instructions-list">
       <% shoppingList.forEach(function(ingredient) { %>
         <li class="list-group-item list-group-item-custom"><%= ingredient %></li>
       <% }); %>
-    </ul>
+    </ul><br>
+<div class="d-flex justify-content-end">
+    <a href="/shopping-list" type="submit" class="btn btn-primary">Save</a>
+  </div>
   </div>
 </div>
 
