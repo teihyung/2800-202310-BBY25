@@ -1,0 +1,136 @@
+<%- include("templates/header") %>
+
+<style>
+    .dropdown-food {
+        display: inline-block;
+        position: relative;
+        text-align: center;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        padding: 10px;
+        width: 80%;
+        margin-bottom: 10px;
+    }
+
+    select {
+        padding: 6px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        width: 80%;
+    }
+
+    .spicy {
+        margin-top: 10px;
+        margin-bottom: 10px;
+        display: inline-block;
+        position: relative;
+        text-align: center;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        padding: 10px;
+        width: 80%;
+    }
+
+    .cooking-time {
+        display: inline-block;
+        position: relative;
+        text-align: center;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        padding: 10px;
+        width: 80%;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+
+    .serving {
+        margin-top: 10px;
+        margin-bottom: 10px;
+        display: inline-block;
+        position: relative;
+        text-align: center;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        padding: 10px;
+        width: 80%;
+    }
+</style>
+
+<script>
+    function selectServing() {
+        var servingSelect = document.getElementById("servings-select");
+        var selectedServing = servingSelect.value;
+        console.log(selectedServing); // You can perform actions based on the selected value
+    }
+
+    function selectTime() {
+        var timeSelect = document.getElementById("time-select");
+        var selectedTime = timeSelect.value;
+        console.log(selectedTime); // You can perform actions based on the selected value
+    }
+
+    function selectCuisine() {
+        var cuisineSelect = document.getElementById("cuisine-select");
+        var selectedCuisine = cuisineSelect.value;
+        console.log(selectedCuisine); // You can perform actions based on the selected value
+    }
+
+    function spicyLevel() {
+        var spiciness = document.getElementById("spicy-select");
+        var spicyLevel = spiciness.value;
+        console.log(spicyLevel); // You can perform actions based on the selected value
+    }
+</script>
+
+<div class="container py-4">
+    <%- include("templates/searchBar") %>
+    <div class="row justify-content-center py-5">
+        <div class="dropdown-food">
+            <h3>Cuisine</h3>
+            <label for="cuisine-select"></label><select id="cuisine-select" onchange="selectCuisine()">
+                <option value="italian">Italian</option>
+                <option value="mexican">Mexican</option>
+                <option value="indian">Indian</option>
+                <option value="chinese">Chinese</option>
+                <option value="korean">Korean</option>
+                <option value="japanese">Japanese</option>
+                <option value="mediterranean">Mediterranean</option>
+                <option value="random">Any</option>
+            </select>
+        </div>
+        <div class="spicy">
+            <h3>Do you like spicy food?</h3>
+            <label for="spicy-select"></label><select id="spicy-select" onchange="selectCuisine()">
+                <option value="Spicy-Yes">Yes</option>
+                <option value="Spicy-No">No</option>
+            </select>
+        </div>
+
+        <div class="cooking-time">
+            <h3>Cooking time?</h3>
+            <label for="time-select"></label><select id="time-select" onchange="selectTime()">
+                <option value="15min">15 minutes</option>
+                <option value="30min">30 minutes</option>
+                <option value="45min">45 minutes</option>
+                <option value="1hr">1 hour</option>
+                <option value="1hr30min">1 hour 30 minutes</option>
+                <option value="2hr">2 hours</option>
+                <option value="any-time">Does not matter</option>
+            </select>
+        </div>
+
+        <div class="serving">
+            <h3>For how many people?</h3>
+            <label for="servings-select"></label><select id="servings-select" onchange="selectServing()">
+                <option value="1">One person</option>
+                <option value="2">Two people</option>
+                <option value="3~4">Three to Four people</option>
+                <option value="5~6">Five to Six people</option>
+            </select>
+        </div>
+    </div>
+    <div class="col-md-12 text-center">
+        <button class="w-30 btn btn-lg btn-primary" type="submit">Submit</button>
+    </div>
+</div>
+<%- include("templates/footer") %>

@@ -851,6 +851,10 @@ app.get('/ingredientsList', sessionValidation, async (req, res) => {
     }
 });
 
+app.get('/filter', sessionValidation, async (req, res) => {
+    res.render("filter");
+});
+
 app.use(express.static(__dirname + "/public"));
 
 app.get("*", (req, res) => {
