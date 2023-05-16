@@ -10,14 +10,15 @@
 
   .content-wrapper {
     background-color: rgba(255, 255, 255, 0.8);
-    padding: 20px;
+    padding: 10px;
     border-radius: 15px;
+    margin: 10px;
   }
 
-  h1 {
+  /* h1 {
     font-size: 2rem;
     font-weight: 700;
-  }
+  } */
 
   h2 {
     font-weight: 700;
@@ -41,7 +42,8 @@
   <% if (bookmarks.length > 0) { %>
     <% for (let bookmark of bookmarks) { %>
       <div class="content-wrapper">
-        <h1 class="mb-4"><%= bookmark.title %></h1>
+        <h3 class="mb-1"><b><a href="<%= bookmark.url %>"><%= bookmark.title %></a></b></h3>
+
       </div>
     <% } %>
   <% } else { %>
@@ -49,4 +51,31 @@
   <% } %>
 </div>
 
+
+
+
+
 <%- include("templates/footer") %>
+
+<script>
+  const bookmarkLinks = document.querySelectorAll('.bookmark-link');
+  bookmarkLinks.forEach(link => {
+    link.addEventListener('click', async (event) => {
+      event.preventDefault();
+      const bookmarkId = link.dataset.bookmarkId;
+      const response = await fetch(`/bookmarks/${bookmarkId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      if (response.ok) {
+        const bookmark = await response.text(); // 수정: response.json() 대신 response.text() 호출
+        // Handle the bookmark data as needed
+        console.log(bookmark);
+      } else {
+        console.error('Failed to retrieve bookmark');
+      }
+    });
+  });
+</script>

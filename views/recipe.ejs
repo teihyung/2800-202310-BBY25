@@ -113,7 +113,7 @@
     }
 
     // Send a request to the server to add or remove the bookmark
-    const response = await fetch('/bookmarks/add', {
+    const response = await fetch(isBookmarked ? '/bookmarks/add' : '/bookmarks/remove', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -121,8 +121,7 @@
       body: JSON.stringify({
         title: '<%= name %>',
         instructions: '<%= instructions %>',
-        url: window.location.href,
-        isBookmarked: isBookmarked
+        url: '<%= originalUrl %>', // use server-provided URL
       }),
     });
 
@@ -133,4 +132,6 @@
   });
 </script>
 
+
 <%- include("templates/footer") %>
+

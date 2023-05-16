@@ -583,6 +583,7 @@ app.get('/recipe/:name', async (req, res) => {
         name: recipeName,
         instructions: instructionsText,
         userIngredients: req.query.userIngredients || '',
+        originalUrl: req.originalUrl
       });
     } catch (error) {
       console.log(error);
@@ -653,21 +654,24 @@ app.get('/recipe/:name', async (req, res) => {
     if (req.session.authenticated) {
       try {
         const { title, instructions, url, isBookmarked } = req.body;        
-        const userId = req.session.userId;
         const userEmail = req.session.email;
-
-
-        // Update the user's bookmarks array
-    const result = await userCollection.updateOne(
-        { email: userEmail },
-        // { $push: { bookmarks: bookmark } }
-        { $push: { bookmarks: { title, instructions, url, isBookmarked } } }
-
-      );
-      console.log(result);
-
-        console.log("Inserted bookmark");
-        res.status(200).send('Bookmark added successfully');
+        
+        const user = await userCollection.findOne({ email: userEmail });
+        const existingBookmarkIndex = user.bookmarks.findIndex(bookmark => bookmark.url === url);
+  
+        if (existingBookmarkIndex === -1) {
+          // Bookmark does not exist, add it
+          const result = await userCollection.updateOne(
+            { email: userEmail },
+            { $push: { bookmarks: { title, instructions, url, isBookmarked } } }
+          );
+          
+          console.log(result);
+          res.status(200).send('Bookmark added successfully');
+        } else {
+          // Bookmark already exists
+          res.status(400).send('Bookmark already exists');
+        }
       } catch (error) {
         console.log(error);
         res.status(500).send('Internal server error');
@@ -676,6 +680,60 @@ app.get('/recipe/:name', async (req, res) => {
       res.status(401).send('Unauthorized');
     }
   });
+
+  app.post('/bookmarks/remove', sessionValidation, async (req, res) => {
+    if (req.session.authenticated) {
+      try {
+        const { url } = req.body;        
+        const userEmail = req.session.email;
+        
+        const user = await userCollection.findOne({ email: userEmail });
+        const existingBookmarkIndex = user.bookmarks.findIndex(bookmark => bookmark.url === url);
+  
+        if (existingBookmarkIndex !== -1) {
+          // Bookmark exists, remove it
+          const result = await userCollection.updateOne(
+            { email: userEmail },
+            { $pull: { bookmarks: { url } } }
+          );
+          
+          console.log(result);
+          res.status(200).send('Bookmark removed successfully');
+        } else {
+          // Bookmark does not exist
+          res.status(400).send('Bookmark does not exist');
+        }
+      } catch (error) {
+        console.log(error);
+        res.status(500).send('Internal server error');
+      }
+    } else {
+      res.status(401).send('Unauthorized');
+    }
+  });
+
+//   app.get('/bookmarks/:email', sessionValidation, async (req, res) => {
+//     if (req.session.authenticated) {
+//       try {
+//         const email = req.params.email;
+//         const user = await userCollection.findOne({ email });
+  
+//         if (user) {
+//           // Render the bookmarks page with the user's bookmarks
+//           res.render('bookmarks', { bookmarks: user.bookmarks });
+//         } else {
+//           res.status(404).send('User not found');
+//         }
+//       } catch (error) {
+//         console.log(error);
+//         res.status(500).send('Internal server error');
+//       }
+//     } else {
+//       res.status(401).send('Unauthorized');
+//     }
+//   });
+
+ 
 
 app.get('/change_password', (req, res) => {
     if(!req.session.forgotPassword){
