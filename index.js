@@ -537,7 +537,7 @@ app.post('/saveProfile', async (req, res) => {
 });
 
 app.get('/recipe/:name', async (req, res) => {
-    const recipeName = req.params.name;
+    const recipeName = req.params.name.replace(/^\d+\.\s*/, ''); // Remove the number and dot in front of the name
     const userIngredients = req.query.userIngredients || '';
     const messages = [
       { role: 'system', content: 'You are a helpful assistant that provides detailed instructions for a given recipe.' },
@@ -591,7 +591,7 @@ app.get('/recipe/:name', async (req, res) => {
   });
   
   app.get('/shopping-list/:name', async (req, res) => {
-    const recipeName = req.params.name;
+    const recipeName = req.params.name.replace(/^\d+\.\s*/, '');
   
     // Get the userIngredients from the query string
     const userIngredients = req.query.userIngredients
