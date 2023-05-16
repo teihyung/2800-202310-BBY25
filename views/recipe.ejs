@@ -32,6 +32,8 @@
     list-style-type: none;
     padding: 0;
   }
+
+
 </style>
 
 
@@ -45,18 +47,84 @@
 <script src="/path/to/spinner.js"></script>
 <div class="container mt-4">
   <div class="content-wrapper">
-    <h1 class="mb-4"><%= name %></h1>
-    <h2>Instructions</h2>
-    <!-- Add this inside the recipe.ejs file -->
+  <h1 class="mb-4">
+    <%= name %>
+    <div class="mt-auto align-self-end">
+      <a href="/bookmarked" class="bookmark-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-bookmark" viewBox="0 0 16 16">
+          <path fill="currentColor" d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5V2zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1H4z"/>
+        </svg>
+      </a>
+    </div>
+  </h1>
+  <h2>Instructions</h2>
+  <!-- Add this inside the recipe.ejs file -->
 <a href="/shopping-list/<%= encodeURIComponent(name) %>?userIngredients=<%= encodeURIComponent(userIngredients) %>" class="btn btn-primary">View Shopping List</a>
 
 <ul class="instructions-list">
-    <% instructions.forEach(function(step) { %>
-      <li><%= step %></li>
-    <% }); %>
-       
+
+  <% instructions.forEach(function(step) { %>
+    <li><%= step %></li>
+  <% }); %>
+     
 </ul>
   </div>
 </div>
+
+<style>
+  .bookmarked svg {
+    /* 북마크가 되었을 때의 스타일 */
+    color: red;
+    fill: red;
+  }
+
+  .bi-bookmark-fill svg  {
+    /* 아이콘을 채우는 스타일 */
+    fill: red;
+  }
+  .filled svg  {
+  fill: red;
+}
+</style>
+
+<script>
+  const bookmarkIcon = document.querySelector('.bookmark-icon');
+  bookmarkIcon.addEventListener('click', async function (event) {
+    event.preventDefault(); // Prevents the default behavior of the link
+
+    bookmarkIcon.classList.toggle('bookmarked');
+
+    // Check if the recipe is bookmarked after the icon is toggled
+    const isBookmarked = bookmarkIcon.classList.contains('bookmarked');
+
+    const bookmarkIconSvg = bookmarkIcon.querySelector('svg');
+    const bookmarkIconSvgPath = bookmarkIconSvg.querySelector('path');
+
+    if (isBookmarked) {
+      bookmarkIconSvgPath.setAttribute('fill', 'red'); // fill the bookmark
+    } else {
+      bookmarkIconSvgPath.setAttribute('fill', 'currentColor'); // unfill the bookmark
+    }
+
+    // Send a request to the server to add or remove the bookmark
+    const response = await fetch('/bookmarks/add', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        title: '<%= name %>',
+        instructions: '<%= instructions %>',
+        url: window.location.href,
+        isBookmarked: isBookmarked
+      }),
+    });
+
+    // Handle any errors
+    if (!response.ok) {
+      console.error('Failed to update bookmark status');
+    }
+  });
+</script>
 
 <%- include("templates/footer") %>
