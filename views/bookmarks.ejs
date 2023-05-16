@@ -43,39 +43,51 @@
     <% for (let bookmark of bookmarks) { %>
       <div class="content-wrapper">
         <h3 class="mb-1"><b><a href="<%= bookmark.url %>"><%= bookmark.title %></a></b></h3>
-
+        <!-- <p><%= bookmark.instructions %></p>
+        <p><%= bookmark.isBookmarked ? 'Bookmarked' : 'Not bookmarked' %></p> -->
       </div>
     <% } %>
   <% } else { %>
     <p>No bookmarks found.</p>
   <% } %>
 </div>
-
-
-
-
-
 <%- include("templates/footer") %>
 
 <script>
   const bookmarkLinks = document.querySelectorAll('.bookmark-link');
   bookmarkLinks.forEach(link => {
+    const bookmarkId = link.dataset.bookmarkId;
+    const isBookmarked = link.classList.contains('bookmarked');
+    const bookmarkIcon = link.querySelector('svg');
+    const bookmarkIconPath = bookmarkIcon.querySelector('path');
+    
+    if (isBookmarked) {
+      bookmarkIconPath.setAttribute('fill', 'red');
+    }
+
     link.addEventListener('click', async (event) => {
       event.preventDefault();
-      const bookmarkId = link.dataset.bookmarkId;
-      const response = await fetch(`/bookmarks/${bookmarkId}`, {
-        method: 'GET',
+      
+      // Toggle the bookmarked class and update the icon color
+      link.classList.toggle('bookmarked');
+      bookmarkIconPath.setAttribute('fill', link.classList.contains('bookmarked') ? 'red' : 'currentColor');
+
+      // Send a request to the server to add or remove the bookmark
+      const response = await fetch(link.classList.contains('bookmarked') ? '/bookmarks/add' : '/bookmarks/remove', {
+        method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          bookmarkId: bookmarkId
+        }),
       });
-      if (response.ok) {
-        const bookmark = await response.text(); // 수정: response.json() 대신 response.text() 호출
-        // Handle the bookmark data as needed
-        console.log(bookmark);
-      } else {
-        console.error('Failed to retrieve bookmark');
+
+      if (!response.ok) {
+        console.error('Failed to update bookmark status');
       }
     });
   });
 </script>
+
+
