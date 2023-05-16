@@ -1,0 +1,12 @@
+<%- include("templates/header") %>
+<h1>Recipe Recommendations</h1>
+<% if (recipes.length > 0) { %>
+    <ul>
+        <% recipes.forEach(function(recipe) { %>
+            <li><%= recipe %></li>
+        <% }); %>
+    </ul>
+<% } else { %>
+    <p>No recipes found.</p>
+<% } %>
+<%- include("templates/footer") %>
