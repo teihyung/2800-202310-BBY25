@@ -30,6 +30,9 @@
     text-decoration: underline;
   
   }
+  .list-group-item-custom {
+    background-color: rgba(255, 204, 0, 0.5);
+  }
 </style>
 
 <!-- Add this inside your HTML body -->
@@ -49,7 +52,8 @@
       <h2>Recipes</h2>
       <ul class="list-group">
         <% recipes.forEach(function(recipe) { %>
-          <li class="list-group-item">
+        <li class="list-group-item list-group-item-custom">
+
             <a href="/recipe/<%= encodeURIComponent(recipe) %>"><%= recipe %></a>
           </li>
         <% }); %>

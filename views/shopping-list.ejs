@@ -28,8 +28,8 @@
     padding: 0;
   }
 
-  li {
-    margin-bottom: 10px;
+  .list-group-item-custom {
+    background-color: rgba(255, 204, 0, 0.5);
   }
 </style>
 
@@ -37,9 +37,9 @@
   <div class="content-wrapper">
     <h1 class="mb-4"><%= name %></h1>
     <h2>Shopping List</h2>
-    <ul>
+    <ul class="list-group instructions-list">
       <% shoppingList.forEach(function(ingredient) { %>
-        <li><%= ingredient %></li>
+        <li class="list-group-item list-group-item-custom"><%= ingredient %></li>
       <% }); %>
     </ul>
   </div>
