@@ -60,10 +60,9 @@
 <a href="/shopping-list/<%= encodeURIComponent(name) %>?userIngredients=<%= encodeURIComponent(userIngredients) %>" class="btn btn-primary">View Shopping List</a>
 
 <ul class="instructions-list">
-  <% instructions.forEach(function(step) { %>
-    <li><%= step %></li>
-  <% }); %>
-     
+    <% instructions.forEach(function(step) { %>
+      <li><%= step %></li>
+    <% }); %>       
 </ul>
   </div>
 </div>
