@@ -14,9 +14,9 @@
     }
 
     .form-floating {
-        width: 70%; /* Adjust the width as needed */
-        margin: 0 auto;
+        width: 100%; /* Adjust the width as needed */
     }
+
     .login-link a:active {
         position: relative;
         transition: background-color 1s;
@@ -48,10 +48,11 @@
     <main class="form-signin m-auto">
         <div class="row justify-content-center py-5">
             <div class="col-md-6">
-                <form action="/submitUser" method="post" class="text-center">
+                <form class="w-75 mx-auto" action="/submitUser" method="post">
                     <h1 class="h3 mb-3 fw-normal">Please sign up</h1>
                     <div class="form-floating">
-                        <input name="username" type="text" class="form-control" id="floatingInput" placeholder="username">
+                        <input name="username" type="text" class="form-control" id="floatingInput"
+                               placeholder="username">
                         <label for="floatingInput">Username</label>
                     </div>
                     <div class="form-floating">
@@ -59,14 +60,15 @@
                         <label for="floatingInput">Email address</label>
                     </div>
                     <div class="form-floating">
-                        <input name='password' type="password" class="form-control" id="floatingPassword" placeholder="password">
+                        <input name='password' type="password" class="form-control" id="floatingPassword"
+                               placeholder="password">
                         <label for="floatingPassword">Password</label>
                     </div>
                     <br>
                     <div class="login-link">
                         <a href="/login">Already have an account? Login here</a><br><br>
                     </div>
-                    <button class="w-75 btn btn-lg btn-primary">Submit</button>
+                    <button class="w-100 btn btn-lg btn-primary">Submit</button>
                 </form>
             </div>
         </div>
