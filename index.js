@@ -537,11 +537,11 @@ app.post('/saveProfile', async (req, res) => {
 });
 
 app.get('/recipe/:name', async (req, res) => {
-    const recipeName = req.params.name;
+    const recipeName = req.params.name.replace(/^\d+\.\s*/, ''); // Remove the number and dot in front of the name
     const userIngredients = req.query.userIngredients || '';
     const messages = [
       { role: 'system', content: 'You are a helpful assistant that provides detailed instructions for a given recipe.' },
-      { role: 'user', content: `Provide step-by-step instructions on how to make ${recipeName}. Please have step number before each line. But do not include the ingrediant list.` },
+      { role: 'user', content: `Provide step-by-step instructions on how to make ${recipeName}. Please have step number before each line. But do not include the ingrediant list. No blank line between two steps.` },
     ];
   
     try {
@@ -575,9 +575,6 @@ app.get('/recipe/:name', async (req, res) => {
           const currentStep = parseInt(stepMatch[0]);
           const instruction = line.replace(/^\d+\.\s/, '').trim();
           instructions.push({ step: currentStep, instruction });
-        } else if (instructions.length > 0) {
-          // Line doesn't start with a step number, append it to the previous instruction
-          instructions[instructions.length - 1].instruction += ' ' + line.trim();
         }
       });
   
@@ -595,7 +592,7 @@ app.get('/recipe/:name', async (req, res) => {
   });
   
   app.get('/shopping-list/:name', async (req, res) => {
-    const recipeName = req.params.name;
+    const recipeName = req.params.name.replace(/^\d+\.\s*/, '');
   
     // Get the userIngredients from the query string
     const userIngredients = req.query.userIngredients
@@ -610,7 +607,7 @@ app.get('/recipe/:name', async (req, res) => {
       },
       {
         role: 'user',
-        content: `Provide a list of ingredients need to buy for ${recipeName}. Please have the number before each line.`,
+        content: `Provide a list of ingredients need to buy for ${recipeName}. Please have the number before each line.  No blank line between two ingrediants.`,
       },
     ];
   
@@ -636,7 +633,7 @@ app.get('/recipe/:name', async (req, res) => {
       }
   
       const ingredientsText = ingredientsMatch[0].trim().split('\n');
-  
+     
       // Filter the ingredients to generate the shopping list
       const shoppingList = ingredientsText.filter(
         (ingredient) => !userIngredients.includes(ingredient)

@@ -33,6 +33,10 @@
     padding: 0;
   }
 
+  .list-group-item-custom {
+    background-color: rgba(255, 204, 0, 0.5);
+  }
+
 
 </style>
 
@@ -61,13 +65,15 @@
   <!-- Add this inside the recipe.ejs file -->
 <a href="/shopping-list/<%= encodeURIComponent(name) %>?userIngredients=<%= encodeURIComponent(userIngredients) %>" class="btn btn-primary">View Shopping List</a>
 
-<ul class="instructions-list">
 
+<ul class="list-group instructions-list">
   <% instructions.forEach(function(step) { %>
-    <li><%= step %></li>
+    <li class="list-group-item list-group-item-custom"><%= step %></li>
   <% }); %>
-     
+
 </ul>
+
+
   </div>
 </div>
 
@@ -128,3 +134,4 @@
 
 
 <%- include("templates/footer") %>
+
