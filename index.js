@@ -421,7 +421,9 @@ function getRandomRecipes(data, count) {
       });
     })
   }
-    
+
+  let randomRecipes;
+
   app.get('/members', async (req, res) => {
     if (req.session.authenticated) {
         try {    
@@ -437,7 +439,8 @@ function getRandomRecipes(data, count) {
   
             if (!ingredient) {
                 try {
-                    const randomRecipes = await getRandomRecipeSuggestions(); 
+                    // const randomRecipes = await getRandomRecipeSuggestions(); 
+                    randomRecipes = await getRandomRecipeSuggestions(); 
                     res.render('index', { userData, randomRecipes: randomRecipes });
                     console.log(req.session.username);
   
@@ -590,6 +593,40 @@ app.get('/recipe/:name', async (req, res) => {
       res.status(500).send('Error retrieving recipe instructions.');
     }
   });
+
+
+
+app.get('/recipe_ran/:title', (req, res) => {
+    try {
+      const recipeTitle = req.params.title;
+  
+      // Find the recipe with matching title from the randomRecipes variable
+      const recipe = randomRecipes.find(recipe => recipe.Title === recipeTitle);
+  
+      if (!recipe) {
+        res.status(404).send('Recipe not found.');
+        return;
+      }
+  
+      const recipeInstructions = recipe.Instructions.split('\n').filter(instruction => instruction.trim() !== '');
+      const recipeIngredients = recipe.Ingredients.split(',').map(ingredient => ingredient.trim());
+      const formattedIngredients = recipeIngredients.join('\n').replace(/[\[\]']/g, '').replace(/plus more|and/g, '');
+  
+      // Render the 'recipe' template and pass the recipeTitle, recipeInstructions, and recipeIngredients variables
+      res.render('random_recipe', { 
+        recipeImage: recipe.Image_Name, 
+        recipeTitle: recipe.Title, 
+        recipeInstructions: recipeInstructions, 
+        recipeIngredients: formattedIngredients,
+        originalUrl: req.originalUrl });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Error retrieving recipe instructions.');
+    }
+  });
+  
+
+
   
   app.get('/shopping-list/:name', async (req, res) => {
     const recipeName = req.params.name.replace(/^\d+\.\s*/, '');
