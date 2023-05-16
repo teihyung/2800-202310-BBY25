@@ -36,33 +36,14 @@ const openaiConfiguration = new Configuration({
 });
 const openai = new OpenAIApi(openaiConfiguration);
 
+
+
+
+
+
 app.get('/', (req, res) => {
     res.render("main");
 });
-
-app.get('/recipe/:name', async (req, res) => {
-    const recipeName = req.params.name;
-
-    const messages = [
-        { role: 'system', content: 'You are a helpful assistant that provides detailed instructions for a given recipe.' },
-        { role: 'user', content: `How do I make ${recipeName}?` },
-    ];
-
-    try {
-        const completion = await openai.createChatCompletion({
-            model: 'gpt-3.5-turbo',
-            messages: messages,
-        });
-
-        const completionText = completion.data.choices[0].message.content;
-        res.render('recipe', { name: recipeName, instructions: completionText });
-    } catch (error) {
-        console.log(error);
-        res.status(500).send('Error retrieving recipe instructions.');
-    }
-});
-
-
 
 /* secret information section */
 const mongodb_host = process.env.MONGODB_HOST;
@@ -246,19 +227,26 @@ app.post('/submitUser', async (req, res) => {
 
     var hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    await userCollection.insertOne({
-        email: email,
-        username: username,
-        password: hashedPassword,
-        user_type: "user",
-        status_user: status_user
-    });
-    console.log("Inserted user");
+    try {
+        await userCollection.insertOne({
+            email: email,
+            username: username,
+            password: hashedPassword,
+            user_type: "user",
+            status_user: status_user,
+            bookmarks:[]
+        });
+        console.log("Inserted user");
 
-    req.session.authenticated = true;
-    req.session.email = email;
-    req.session.cookie.maxAge = expireTime;
-    res.redirect('/members');
+        req.session.authenticated = true;
+        req.session.email = email;
+        req.session.cookie.maxAge = expireTime;
+        res.redirect('/members');
+    } catch (error) {
+        console.error("Failed to insert user: ", error);
+        // Handle the error here. You may want to redirect to an error page or show a message to the user.
+        res.status(500).send("Error creating user.");
+    }
 });
 
 app.post('/loggingin', async (req, res) => {
@@ -462,7 +450,7 @@ function getRandomRecipes(data, count) {
   
             const messages = [
                 { role: 'system', content: 'You are a helpful assistant that suggests recipes based on given ingredients.' },
-                { role: 'user', content: `Give me some recipes with ${ingredient}.` },
+                { role: 'user', content: `Give me some recipe options with ${ingredient}. Only the names please` },
             ];
   
             try {
@@ -548,31 +536,204 @@ app.post('/saveProfile', async (req, res) => {
     }
 });
 
+app.get('/recipe/:name', async (req, res) => {
+    const recipeName = req.params.name.replace(/^\d+\.\s*/, ''); // Remove the number and dot in front of the name
+    const userIngredients = req.query.userIngredients || '';
+    const messages = [
+      { role: 'system', content: 'You are a helpful assistant that provides detailed instructions for a given recipe.' },
+      { role: 'user', content: `Provide step-by-step instructions on how to make ${recipeName}. Please have step number before each line. But do not include the ingrediant list. No blank line between two steps.` },
+    ];
+  
+    try {
+      const completion = await openai.createChatCompletion({
+        model: 'gpt-3.5-turbo',
+        messages: messages,
+      });
+  
+      const completionText = completion.data.choices[0].message.content;
+      console.log(completionText); // Add this line to print the completion text
 
-app.post('/bookmarks/add', sessionValidation, async (req, res) => {
-    if (req.session.authenticated) {
-        try {
-            const {title, url} = req.body;   // ???
-            const userId = req.session.userId;
+      const instructionsRegex = /(\d+\..*\n?)+/g;
 
-            await database.db(mongodb_database).collection('bookmarks').insertOne({
-                    username: username,
-                    title: title,
-                    url: url
-                }
-            );
-            console.log("Inserted user");
+  
+      const instructionsMatch = completionText.match(instructionsRegex);
+  
+      if (!instructionsMatch) {
+        // Handle the case where the regex didn't match any text
+        res.status(500).send('Error retrieving instructions from the completion text.');
+        return;
+      }
+  
+      const instructionsText = instructionsMatch[0].trim().split('\n').filter(line => line.trim() !== '');
 
-
-            res.status(200).send('Bookmark added successfully');
-        } catch (error) {
-            console.log(error);
-            res.status(500).send('Internal server error');
+      const instructions = [];
+  
+      instructionsText.forEach(line => {
+        const stepMatch = line.match(/^\d+/);
+        if (stepMatch) {
+          // Line starts with a step number, update the current step
+          const currentStep = parseInt(stepMatch[0]);
+          const instruction = line.replace(/^\d+\.\s/, '').trim();
+          instructions.push({ step: currentStep, instruction });
         }
-    } else {
-        res.status(401).send('Unauthorized');
+      });
+  
+  
+      res.render('recipe', {
+        name: recipeName,
+        instructions: instructionsText,
+        userIngredients: req.query.userIngredients || '',
+        originalUrl: req.originalUrl
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).send('Error retrieving recipe instructions.');
     }
-})
+  });
+  
+  app.get('/shopping-list/:name', async (req, res) => {
+    const recipeName = req.params.name.replace(/^\d+\.\s*/, '');
+  
+    // Get the userIngredients from the query string
+    const userIngredients = req.query.userIngredients
+      ? req.query.userIngredients.split(',')
+      : [];
+  
+    const messages = [
+      {
+        role: 'system',
+        content:
+          'You are a helpful assistant that provides detailed instructions for a given recipe.',
+      },
+      {
+        role: 'user',
+        content: `Provide a list of ingredients need to buy for ${recipeName}. Please have the number before each line.  No blank line between two ingrediants.`,
+      },
+    ];
+  
+    try {
+      const completion = await openai.createChatCompletion({
+        model: 'gpt-3.5-turbo',
+        messages: messages,
+      });
+  
+      const completionText = completion.data.choices[0].message.content;
+      console.log(completionText); // Add this line to print the completion text
+  
+      const ingredientsRegex = /(\d+\..*\n?)+/g;
+
+      
+  
+      const ingredientsMatch = completionText.match(ingredientsRegex);
+  
+      if (!ingredientsMatch) {
+        // Handle the case where the regex didn't match any text
+        res.status(500).send('Error retrieving ingredients from the completion text.');
+        return;
+      }
+  
+      const ingredientsText = ingredientsMatch[0].trim().split('\n');
+     
+      // Filter the ingredients to generate the shopping list
+      const shoppingList = ingredientsText.filter(
+        (ingredient) => !userIngredients.includes(ingredient)
+      );
+  
+      res.render('shopping-list', {
+        name: recipeName,
+        shoppingList: shoppingList,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).send('Error retrieving recipe instructions.');
+    }
+  });
+
+
+  app.post('/bookmarks/add', sessionValidation, async (req, res) => {
+    if (req.session.authenticated) {
+      try {
+        const { title, instructions, url, isBookmarked } = req.body;        
+        const userEmail = req.session.email;
+        
+        const user = await userCollection.findOne({ email: userEmail });
+        const existingBookmarkIndex = user.bookmarks.findIndex(bookmark => bookmark.url === url);
+  
+        if (existingBookmarkIndex === -1) {
+          // Bookmark does not exist, add it
+          const result = await userCollection.updateOne(
+            { email: userEmail },
+            { $push: { bookmarks: { title, instructions, url, isBookmarked } } }
+          );
+          
+          console.log(result);
+          res.status(200).send('Bookmark added successfully');
+        } else {
+          // Bookmark already exists
+          res.status(400).send('Bookmark already exists');
+        }
+      } catch (error) {
+        console.log(error);
+        res.status(500).send('Internal server error');
+      }
+    } else {
+      res.status(401).send('Unauthorized');
+    }
+  });
+
+  app.post('/bookmarks/remove', sessionValidation, async (req, res) => {
+    if (req.session.authenticated) {
+      try {
+        const { url } = req.body;        
+        const userEmail = req.session.email;
+        
+        const user = await userCollection.findOne({ email: userEmail });
+        const existingBookmarkIndex = user.bookmarks.findIndex(bookmark => bookmark.url === url);
+  
+        if (existingBookmarkIndex !== -1) {
+          // Bookmark exists, remove it
+          const result = await userCollection.updateOne(
+            { email: userEmail },
+            { $pull: { bookmarks: { url } } }
+          );
+          
+          console.log(result);
+          res.status(200).send('Bookmark removed successfully');
+        } else {
+          // Bookmark does not exist
+          res.status(400).send('Bookmark does not exist');
+        }
+      } catch (error) {
+        console.log(error);
+        res.status(500).send('Internal server error');
+      }
+    } else {
+      res.status(401).send('Unauthorized');
+    }
+  });
+
+//   app.get('/bookmarks/:email', sessionValidation, async (req, res) => {
+//     if (req.session.authenticated) {
+//       try {
+//         const email = req.params.email;
+//         const user = await userCollection.findOne({ email });
+  
+//         if (user) {
+//           // Render the bookmarks page with the user's bookmarks
+//           res.render('bookmarks', { bookmarks: user.bookmarks });
+//         } else {
+//           res.status(404).send('User not found');
+//         }
+//       } catch (error) {
+//         console.log(error);
+//         res.status(500).send('Internal server error');
+//       }
+//     } else {
+//       res.status(401).send('Unauthorized');
+//     }
+//   });
+
+ 
 
 app.get('/change_password', (req, res) => {
     if(!req.session.forgotPassword){
@@ -599,23 +760,68 @@ app.post('/change_password', async (req, res) => {
         res.render('change_password', { error });
     }
 });
+
+
+// app.post('/bookmarks', sessionValidation, async (req, res) => {
+//     if (!req.session.authenticated) {
+//         return res.status(403).send('Not authenticated');
+//     }
+
+//     try {
+//         const {title} = req.body;
+        
+//         await database.db(mongodb_database).collection('bookmarks').insertOne({
+//             userId: req.session.userId,
+//             title: title
+//         });
+
+//         res.status(200).send('Bookmarked');
+//     } catch (error) {
+//         console.log(error);
+//         res.status(500).send('Error bookmarking recipe');
+//     }
+// });
+
+// app.delete('/bookmarks', sessionValidation, async (req, res) => {
+//     if (!req.session.authenticated) {
+//       return res.status(403).send('Not authenticated');
+//     }
+  
+//     try {
+//       const { title } = req.body;
+  
+//       await database.db(mongodb_database).collection('bookmarks').deleteOne({
+//         userId: req.session.userId,
+//         title: title
+//       });
+  
+//       res.status(200).send('Unbookmarked');
+//     } catch (error) {
+//       console.log(error);
+//       res.status(500).send('Error unbookmarking recipe');
+//     }
+//   });
+
+
 app.get('/bookmarks', sessionValidation, async (req, res) => {
     if (req.session.authenticated) {
-        //   try {
-        //     const userId = req.session.userId;
-
-        //     const bookmarks = await database.db(mongodb_database).collection('bookmarks').find({ userId }).toArray();
-
-        //     res.status(200).json(bookmarks);
-        //   } catch (error) {
-        //     console.log(error);
-        //     res.status(500).send('Internal server error');
-        //   }
-        res.render("bookmarks")
+      try {
+        const userEmail = req.session.email;
+        const user = await userCollection.findOne({ email: userEmail });
+  
+        if (user) {
+          res.render('bookmarks', { bookmarks: user.bookmarks });
+        } else {
+          res.status(404).send('User not found');
+        }
+      } catch (error) {
+        console.log(error);
+        res.status(500).send('Internal server error');
+      }
     } else {
-        res.status(401).send('Unauthorized');
+      res.status(401).send('Unauthorized');
     }
-});
+  });
 
 app.get('/ingredientsList', sessionValidation, async (req, res) => {
     if (req.session.authenticated) {
