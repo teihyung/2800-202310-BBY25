@@ -1,5 +1,81 @@
 <%- include("templates/header") %>
 
-<h1>This is a bookmarked page!</h1>
+<!-- Add custom CSS for background image and text -->
+<style>
+  body {
+    background-image: url('/img/background.jpg');
+    background-size: cover;
+    background-position: center;
+  }
+
+  .content-wrapper {
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 10px;
+    border-radius: 15px;
+    margin: 10px;
+  }
+
+  /* h1 {
+    font-size: 2rem;
+    font-weight: 700;
+  } */
+
+  h2 {
+    font-weight: 700;
+  }
+
+  ol li {
+    margin-bottom: 10px;
+  }
+</style>
+
+<div id="loading-spinner" style="display: none;">
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+  <!-- Add your loading spinner markup here, e.g., an animated GIF or an SVG spinner -->
+</div>
+<!-- Add this inside the head tag or right before the closing body tag -->
+<script src="/path/to/spinner.js"></script>
+
+<div class="container mt-4">
+  <% if (bookmarks.length > 0) { %>
+    <% for (let bookmark of bookmarks) { %>
+      <div class="content-wrapper">
+        <h3 class="mb-1"><b><a href="<%= bookmark.url %>"><%= bookmark.title %></a></b></h3>
+
+      </div>
+    <% } %>
+  <% } else { %>
+    <p>No bookmarks found.</p>
+  <% } %>
+</div>
+
+
+
+
 
 <%- include("templates/footer") %>
+
+<script>
+  const bookmarkLinks = document.querySelectorAll('.bookmark-link');
+  bookmarkLinks.forEach(link => {
+    link.addEventListener('click', async (event) => {
+      event.preventDefault();
+      const bookmarkId = link.dataset.bookmarkId;
+      const response = await fetch(`/bookmarks/${bookmarkId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      if (response.ok) {
+        const bookmark = await response.text(); // 수정: response.json() 대신 response.text() 호출
+        // Handle the bookmark data as needed
+        console.log(bookmark);
+      } else {
+        console.error('Failed to retrieve bookmark');
+      }
+    });
+  });
+</script>
