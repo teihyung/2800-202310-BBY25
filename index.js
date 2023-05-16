@@ -50,7 +50,7 @@ app.get('/recipe/:name', async (req, res) => {
     const userIngredients = req.query.userIngredients || '';
     const messages = [
       { role: 'system', content: 'You are a helpful assistant that provides detailed instructions for a given recipe.' },
-      { role: 'user', content: `Provide step-by-step instructions on how to make ${recipeName}. Do not give the step number.` },
+      { role: 'user', content: `Provide step-by-step instructions on how to make ${recipeName}. Please have step number before each line. But do not include the ingrediant list.` },
     ];
   
     try {
@@ -60,7 +60,10 @@ app.get('/recipe/:name', async (req, res) => {
       });
   
       const completionText = completion.data.choices[0].message.content;
-      const instructionsRegex = /Instructions:(.*)/s;
+      console.log(completionText); // Add this line to print the completion text
+
+      const instructionsRegex = /(\d+\..*\n?)+/g;
+
   
       const instructionsMatch = completionText.match(instructionsRegex);
   
@@ -70,16 +73,15 @@ app.get('/recipe/:name', async (req, res) => {
         return;
       }
   
-      const instructionsText = instructionsMatch[1].trim().split('\n').filter(line => line.trim() !== '');
+      const instructionsText = instructionsMatch[0].trim().split('\n').filter(line => line.trim() !== '');
 
       const instructions = [];
-      let currentStep = 1;
-  
+
       instructionsText.forEach(line => {
         const stepMatch = line.match(/^\d+/);
         if (stepMatch) {
           // Line starts with a step number, update the current step
-          currentStep = parseInt(stepMatch[0]);
+          const currentStep = parseInt(stepMatch[0]);
           const instruction = line.replace(/^\d+\.\s/, '').trim();
           instructions.push({ step: currentStep, instruction });
         } else if (instructions.length > 0) {
@@ -119,7 +121,7 @@ app.get('/recipe/:name', async (req, res) => {
       },
       {
         role: 'user',
-        content: `Provide a list of ingredients need to buy for ${recipeName}.`,
+        content: `Provide a list of ingredients need to buy for ${recipeName}. Please have the number before each line.`,
       },
     ];
   
@@ -132,7 +134,7 @@ app.get('/recipe/:name', async (req, res) => {
       const completionText = completion.data.choices[0].message.content;
       console.log(completionText); // Add this line to print the completion text
   
-      const ingredientsRegex = /(-.*\n)+/g;
+      const ingredientsRegex = /(\d+\..*\n?)+/g;
 
       
   
@@ -144,7 +146,7 @@ app.get('/recipe/:name', async (req, res) => {
         return;
       }
   
-      const ingredientsText = ingredientsMatch[1].trim().split('\n');
+      const ingredientsText = ingredientsMatch[0].trim().split('\n');
   
       // Filter the ingredients to generate the shopping list
       const shoppingList = ingredientsText.filter(
