@@ -1,5 +1,52 @@
 <%- include("templates/header") %>
 
-<h1>This is a bookmarked page!</h1>
+<!-- Add custom CSS for background image and text -->
+<style>
+  body {
+    background-image: url('/img/background.jpg');
+    background-size: cover;
+    background-position: center;
+  }
+
+  .content-wrapper {
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 20px;
+    border-radius: 15px;
+  }
+
+  h1 {
+    font-size: 2rem;
+    font-weight: 700;
+  }
+
+  h2 {
+    font-weight: 700;
+  }
+
+  ol li {
+    margin-bottom: 10px;
+  }
+</style>
+
+<div id="loading-spinner" style="display: none;">
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+  <!-- Add your loading spinner markup here, e.g., an animated GIF or an SVG spinner -->
+</div>
+<!-- Add this inside the head tag or right before the closing body tag -->
+<script src="/path/to/spinner.js"></script>
+
+<div class="container mt-4">
+  <% if (bookmarks.length > 0) { %>
+    <% for (let bookmark of bookmarks) { %>
+      <div class="content-wrapper">
+        <h1 class="mb-4"><%= bookmark.title %></h1>
+      </div>
+    <% } %>
+  <% } else { %>
+    <p>No bookmarks found.</p>
+  <% } %>
+</div>
 
 <%- include("templates/footer") %>
