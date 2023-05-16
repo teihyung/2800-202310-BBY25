@@ -1,9 +1,56 @@
 <%- include("templates/header") %>
 
+<!-- Add custom CSS for background image and text -->
+<style>
+  body {
+    background-image: url('/img/background.jpg');
+    background-size: cover;
+    background-position: center;
+  }
+
+  .content-wrapper {
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 20px;
+    border-radius: 15px;
+  }
+
+  h1 {
+    font-size: 2rem;
+    font-weight: 700;
+  }
+
+  h2 {
+    font-weight: 700;
+  }
+
+  ol li {
+    margin-bottom: 10px;
+  }
+</style>
+
+
+<div id="loading-spinner" style="display: none;">
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+  <!-- Add your loading spinner markup here, e.g., an animated GIF or an SVG spinner -->
+</div>
+<!-- Add this inside the head tag or right before the closing body tag -->
+<script src="/path/to/spinner.js"></script>
 <div class="container mt-4">
-  <h1 class="mb-4"><%= name %></h1>
-  <h2>Instructions</h2>
-  <p><%= instructions %></p>
+  <div class="content-wrapper">
+    <h1 class="mb-4"><%= name %></h1>
+    <h2>Instructions</h2>
+    <!-- Add this inside the recipe.ejs file -->
+<a href="/shopping-list/<%= encodeURIComponent(name) %>?userIngredients=<%= encodeURIComponent(userIngredients) %>" class="btn btn-primary">View Shopping List</a>
+
+    <ol>
+    <% instructions.forEach(function(step) { %>
+      <li><%= step %></li>
+    <% }); %>
+       
+    </ol>
+  </div>
 </div>
 
 <%- include("templates/footer") %>
