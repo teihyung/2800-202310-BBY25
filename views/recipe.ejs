@@ -26,6 +26,12 @@
   ol li {
     margin-bottom: 10px;
   }
+
+
+  .instructions-list {
+    list-style-type: none;
+    padding: 0;
+  }
 </style>
 
 
@@ -49,16 +55,15 @@
     </div>
   </h1>
   <h2>Instructions</h2>
-
-    <!-- Add this inside the recipe.ejs file -->
+  <!-- Add this inside the recipe.ejs file -->
 <a href="/shopping-list/<%= encodeURIComponent(name) %>?userIngredients=<%= encodeURIComponent(userIngredients) %>" class="btn btn-primary">View Shopping List</a>
 
-    <ol>
-    <% instructions.forEach(function(step) { %>
-      <li><%= step %></li>
-    <% }); %>
-       
-    </ol>
+<ul class="instructions-list">
+  <% instructions.forEach(function(step) { %>
+    <li><%= step %></li>
+  <% }); %>
+     
+</ul>
   </div>
 </div>
 
