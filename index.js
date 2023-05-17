@@ -211,7 +211,6 @@ app.post('/submitUser', async (req, res) => {
     var password = req.body.password;
     var status_user = req.body.status;
 
-
     const schema = Joi.object(
         {
             email: Joi.string().email().required(),
@@ -235,7 +234,8 @@ app.post('/submitUser', async (req, res) => {
             password: hashedPassword,
             user_type: "user",
             status_user: status_user,
-            bookmarks:[]
+            bookmarks: [],
+            search_history: [] // Add the search_history field
         });
         console.log("Inserted user");
 
@@ -249,6 +249,7 @@ app.post('/submitUser', async (req, res) => {
         res.status(500).send("Error creating user.");
     }
 });
+
 
 app.post('/loggingin', async (req, res) => {
     var email = req.body.email;
@@ -436,30 +437,41 @@ function getRandomRecipes(data, count) {
   app.get('/members', async (req, res) => {
     if (req.session.authenticated) {
         try {    
-              
-           const ingredient = req.query.ingredient;
+            const ingredient = req.query.ingredient;
 
-           const result = await userCollection.find({email: req.session.email}).project({
-            username: 1}).toArray();
-
-        const userData = {
-            username: result[0].username
-        }
-  
+            // Retrieve the user's search history from the database
+            const result = await userCollection.findOne({ email: req.session.email });
+          
+            const userData = {
+                username: result.username,
+                search_history: result.search_history
+            };
+            
             if (!ingredient) {
                 try {
-                    // const randomRecipes = await getRandomRecipeSuggestions(); 
                     randomRecipes = await getRandomRecipeSuggestions(); 
-                    res.render('index', { userData, randomRecipes: randomRecipes });
+                   
+                    res.render('index', {
+                        userData: userData,
+                        randomRecipes: randomRecipes,
+                        searchHistory: userData.search_history
+                      });
+                    
+ 
                     console.log(req.session.username);
-  
                 } catch (error) {
                     console.error(error);
                     res.status(500).send('Error retrieving random recipe suggestions.');
                 }
                 return;
-            }      
-  
+            }
+
+            // Update the user's search history in the database
+            await userCollection.updateOne(
+                { email: req.session.email },
+                { $addToSet: { search_history: ingredient } }
+            );
+
             const messages = [
                 { role: 'system', content: 'You are a helpful assistant that suggests recipes based on given ingredients.' },
                 { role: 'user', content: `Give me some recipe options with ${ingredient}. Only the names please` },
@@ -470,10 +482,10 @@ function getRandomRecipes(data, count) {
                     model: 'gpt-3.5-turbo',
                     messages: messages,
                 });
-  
+
                 const completionText = completion.data.choices[0].message.content;
                 const recipes = completionText.split('\n').filter(recipe => recipe.trim() !== '');
-                res.render('search', { recipes: recipes });
+                res.render('search', { userData, recipes: recipes }); // Send the user's search history to the frontend
             } catch (error) {
                 console.log(error);
                 next(error); // Pass the error to the error handling middleware
@@ -483,12 +495,12 @@ function getRandomRecipes(data, count) {
             console.log(error);
             res.redirect('/login');
         }
-  
     } else {
         res.redirect('/login');
         return;
     }
-  });
+});
+
   app.use((error, req, res, next) => {
     res.status(500).render('error', { error: error.message });
 });
