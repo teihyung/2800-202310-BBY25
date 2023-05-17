@@ -565,61 +565,69 @@ app.post('/saveProfile', async (req, res) => {
 });
 
 app.get('/recipe/:name', async (req, res) => {
-    const recipeName = req.params.name.replace(/^\d+\.\s*/, ''); // Remove the number and dot in front of the name
-    const userIngredients = req.query.userIngredients || '';
-    const messages = [
-      { role: 'system', content: 'You are a helpful assistant that provides detailed instructions for a given recipe.' },
-      { role: 'user', content: `Provide step-by-step instructions on how to make ${recipeName}. Please have step number before each line. But do not include the ingrediant list. No blank line between two steps.` },
-    ];
-  
-    try {
-      const completion = await openai.createChatCompletion({
-        model: 'gpt-3.5-turbo',
-        messages: messages,
-      });
-  
-      const completionText = completion.data.choices[0].message.content;
-      console.log(completionText); // Add this line to print the completion text
+  const recipeName = req.params.name.replace(/^\d+\.\s*/, '');
+  const userIngredients = req.query.userIngredients
+    ? req.query.userIngredients.split(',')
+    : [];
 
-      const instructionsRegex = /(\d+\..*\n?)+/g;
+  const messages = [
+    {
+      role: 'system',
+      content:
+        'You are a helpful assistant that provides detailed instructions for a given recipe.',
+    },
+    {
+      role: 'user',
+      content: `Provide a list of ingredients and step-by-step instructions on how to make ${recipeName}. Please have the number before each line. No blank line between two items.`,
+    },
+  ];
 
-  
-      const instructionsMatch = completionText.match(instructionsRegex);
-  
-      if (!instructionsMatch) {
-        // Handle the case where the regex didn't match any text
-        res.status(500).send('Error retrieving instructions from the completion text.');
-        return;
-      }
-  
-      const instructionsText = instructionsMatch[0].trim().split('\n').filter(line => line.trim() !== '');
+  try {
+    const completion = await openai.createChatCompletion({
+      model: 'gpt-3.5-turbo',
+      messages: messages,
+    });
 
-      const instructions = [];
-  
-      instructionsText.forEach(line => {
-        const stepMatch = line.match(/^\d+/);
-        if (stepMatch) {
-          // Line starts with a step number, update the current step
-          const currentStep = parseInt(stepMatch[0]);
-          const instruction = line.replace(/^\d+\.\s/, '').trim();
-          instructions.push({ step: currentStep, instruction });
-        }
-      });
-  
-  
-      res.render('recipe', {
-        name: recipeName,
-        instructions: instructionsText,
-        userIngredients: req.query.userIngredients || '',
-        originalUrl: req.originalUrl,
-        isBookmarksPage: false
-      });
-    } catch (error) {
-      console.log(error);
-      res.status(500).send('Error retrieving recipe instructions.');
+    const completionText = completion.data.choices[0].message.content;
+    const itemsRegex = /(\d+\..*\n?)+/g;
+
+    const itemsMatch = completionText.match(itemsRegex);
+
+    if (!itemsMatch) {
+      res.status(500).send('Error retrieving items from the completion text.');
+      return;
     }
-  });
 
+    const ingredientsText = itemsMatch[0].trim().split('\n');
+    const shoppingList = ingredientsText.filter(
+      (ingredient) => !userIngredients.includes(ingredient)
+    );
+
+    const instructionsText = itemsMatch[1].trim().split('\n').filter((line) => line.trim() !== '');
+
+    const instructions = [];
+
+    instructionsText.forEach((line) => {
+      const stepMatch = line.match(/^\d+/);
+      if (stepMatch) {
+        const currentStep = parseInt(stepMatch[0]);
+        const instruction = line.replace(/^\d+\.\s/, '').trim();
+        instructions.push({ step: currentStep, instruction });
+      }
+    });
+
+    res.render('recipe', {
+      name: recipeName,
+      shoppingList: shoppingList,
+      instructions: instructionsText,
+      userIngredients: req.query.userIngredients || '',
+      originalUrl: req.originalUrl,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send('Error retrieving recipe instructions.');
+  }
+});
 
 // Random recipe's instruction page.
 app.get('/recipe_ran/:title', (req, res) => {
@@ -645,7 +653,8 @@ app.get('/recipe_ran/:title', (req, res) => {
         recipeInstructions: recipeInstructions, 
         recipeIngredients: formattedIngredients,
         originalUrl: req.originalUrl,
-        userId: req.session._id
+        userId: req.session._id,
+        isBookmarksPage: false 
      });
     } catch (error) {
       console.error(error);
@@ -708,8 +717,8 @@ app.post('/shoppingList/add', sessionValidation, async(req, res) => {
                   { $pull: { shoppinglist: { title } } }
                 );
                 
-                // console.log(result);
-                res.status(200).send('List deleted successfully');
+                console.log(result);
+                res.status(200).json({ message: 'List deleted successfully', deletedListTitle: title });
     
               } else {
                 // List already exists
@@ -730,64 +739,7 @@ app.post('/shoppingList/add', sessionValidation, async(req, res) => {
   
 
   
-  app.get('/shopping-list/:name', async (req, res) => {
-    const recipeName = req.params.name.replace(/^\d+\.\s*/, '');
-  
-    // Get the userIngredients from the query string
-    const userIngredients = req.query.userIngredients
-      ? req.query.userIngredients.split(',')
-      : [];
-  
-    const messages = [
-      {
-        role: 'system',
-        content:
-          'You are a helpful assistant that provides detailed instructions for a given recipe.',
-      },
-      {
-        role: 'user',
-        content: `Provide a list of ingredients need to buy for ${recipeName}. Please have the number before each line.  No blank line between two ingrediants.`,
-      },
-    ];
-  
-    try {
-      const completion = await openai.createChatCompletion({
-        model: 'gpt-3.5-turbo',
-        messages: messages,
-      });
-  
-      const completionText = completion.data.choices[0].message.content;
-    //   console.log(completionText); // Add this line to print the completion text
-  
-      const ingredientsRegex = /(\d+\..*\n?)+/g;
-
-      
-  
-      const ingredientsMatch = completionText.match(ingredientsRegex);
-  
-      if (!ingredientsMatch) {
-        // Handle the case where the regex didn't match any text
-        res.status(500).send('Error retrieving ingredients from the completion text.');
-        return;
-      }
-  
-      const ingredientsText = ingredientsMatch[0].trim().split('\n');
-     
-      // Filter the ingredients to generate the shopping list
-      const shoppingList = ingredientsText.filter(
-        (ingredient) => !userIngredients.includes(ingredient)
-      );
-  
-      res.render('shopping-list', {
-        name: recipeName,
-        shoppingList: shoppingList,
-      });
-    } catch (error) {
-      console.log(error);
-      res.status(500).send('Error retrieving recipe instructions.');
-    }
-  });
-
+ 
 
   app.post('/bookmarks/add', sessionValidation, async (req, res) => {
     if (req.session.authenticated) {
