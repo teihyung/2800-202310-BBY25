@@ -40,11 +40,12 @@
     <% if (shoppinglist.length > 0) { %>
       <ul class="list-group instructions-list">
         <% for (let item of shoppinglist) { %>
-          <div class="title">
+          <div class="title" data-title="<%= item.title %>">
             <br>
             <h4>For '<%= item.title %>'</h4>
-             <button class="delete-button" onclick="deleteList('<%= item.title %>')"> - </button>
+            <button class="delete-button" onclick="deleteList('<%= item.title %>')"> - </button>
           </div>
+          
           <% if (item.ingredients) { %>
             <% const ingredientsArray = item.ingredients.split('\n'); %>
             <% for (let ingredient of ingredientsArray) { %>
