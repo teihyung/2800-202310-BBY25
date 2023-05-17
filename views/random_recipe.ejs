@@ -68,8 +68,9 @@
 
 <div class="container mt-4">
   <div class="content-wrapper">
-    <div class="position-relative">
+
       <img src="/img/food/<%= recipeImage %>.jpg" class="card-img-top" alt="<%= recipeImage %>">
+      <div class="position-relative">
       <h1 class="mb-4">
         <%= recipeTitle %>
         <a href="/bookmarked" class="bookmark-icon">
@@ -80,25 +81,41 @@
     </div>
   </h1>
 
-  <!-- Add this inside the recipe.ejs file -->
-  <a href="/shopping-list/<%= recipeTitle %>" class="btn btn-primary">View Shopping List</a>
 
-
-  <div>
+<div class="position-relative">
   <h3>Ingredients</h3>
-  <ul class="list-group instructions-list">
-    <% recipeIngredients.split('\n').forEach(function(ingredient) { %>
-      <li class="list-group-item list-group-item-custom"><%= ingredient %></li>
-    <% }); %>
-  </ul>
-</div><br>
-  <h3>Instructions</h3>
-<ul class="list-group instructions-list">
-  <% recipeInstructions.forEach(function(instruction) { %>
-    <li class="list-group-item list-group-item-custom"><%= instruction %></li>
-  <% }); %>
+  <form id="saveListForm" action="/shoppingList/add" method="post">
+    <!-- Add a hidden input field to store the userId -->
+    <input type="hidden" name="userId" value="<%= userId %>">
+    <!-- Add a hidden input field to store the ingredients -->
+    <input type="hidden" name="title" value="<%= recipeTitle %>">
+    <input type="hidden" name="ingredients" value="<%= recipeIngredients %>"><br>
+    <button type="submit" class="btn btn-primary">Save to Shopping List</button>
+  </form><br>
 
-</ul>
+  <ul class="list-group instructions-list">
+      <% const ingredientsArray = recipeIngredients.split('\n'); %>
+      <% for (let ingredient of ingredientsArray) { %>
+        <% const words = ingredient.trim().split(' '); %>
+        <% console.log(words) %>
+        <% if ((words.length >= 2 && !words[0].includes('ed') && !words[1].includes('ed'))) { %>
+          <li class="list-group-item list-group-item-custom"><%= ingredient %></li>
+        <% } %>
+      <% } %>
+  </ul><br>
+</div>
+
+  <h3>Instructions</h3>
+<ol class="list-group instructions-list">
+  <% recipeInstructions.forEach(function(instruction, index) { %>
+    <li class="list-group-item list-group-item-custom"><%= index + 1 %>. <%= instruction %></li>
+  <% }); %>
+</ol><br><br>
+<!-- <ul class="list-group ingredients-list">
+  <% recipeIngredients.split('\n').forEach(function(ingredient) { %>
+    <li class="list-group-item list-group-item-custom"><%= ingredient %></li>
+  <% }); %>
+</ul> -->
 
 
   </div>
@@ -121,43 +138,76 @@
 </style>
 
 <script>
-  const bookmarkIcon = document.querySelector('.bookmark-icon');
-  bookmarkIcon.addEventListener('click', async function (event) {
-    event.preventDefault(); // Prevents the default behavior of the link
 
-    bookmarkIcon.classList.toggle('bookmarked');
+//  const bookmarkIcon = document.querySelector('.bookmark-icon');
+// bookmarkIcon.addEventListener('click', async function (event) {
+//   event.preventDefault(); // Prevents the default behavior of the link
 
-    // Check if the recipe is bookmarked after the icon is toggled
-    const isBookmarked = bookmarkIcon.classList.contains('bookmarked');
+//   bookmarkIcon.classList.toggle('bookmarked');
 
-    const bookmarkIconSvg = bookmarkIcon.querySelector('svg');
-    const bookmarkIconSvgPath = bookmarkIconSvg.querySelector('path');
+//   // Check if the recipe is bookmarked after the icon is toggled
+//   const isBookmarked = bookmarkIcon.classList.contains('bookmarked');
 
-    if (isBookmarked) {
-      bookmarkIconSvgPath.setAttribute('fill', 'red'); // fill the bookmark
-    } else {
-      bookmarkIconSvgPath.setAttribute('fill', 'currentColor'); // unfill the bookmark
-    }
+//   const bookmarkIconSvg = bookmarkIcon.querySelector('svg');
+//   const bookmarkIconSvgPath = bookmarkIconSvg.querySelector('path');
 
-    // Send a request to the server to add or remove the bookmark
-    const response = await fetch(isBookmarked ? '/bookmarks/add' : '/bookmarks/remove', {
+//   if (isBookmarked) {
+//     bookmarkIconSvgPath.setAttribute('fill', 'red'); // fill the bookmark
+//   } else {
+//     bookmarkIconSvgPath.setAttribute('fill', 'currentColor'); // unfill the bookmark
+//   }
+
+//   // Send a request to the server to add or remove the bookmark
+//   const response = await fetch(isBookmarked ? '/bookmarks/add' : '/bookmarks/remove', {
+//     method: 'POST',
+//     headers: {
+//       'Content-Type': 'application/json',
+//     },
+//     body: JSON.stringify({
+//       title: '<%= recipeTitle %>',
+//       // ingredients: '<%= recipeIngredients %>',
+//       instructions: '<%= recipeInstructions %>',
+//       url: '<%= originalUrl %>', // use server-provided URL
+//     }),
+//   });
+
+//   // Handle any errors
+//   if (!response.ok) {
+//     console.error('Failed to update bookmark status');
+//   }
+// });
+
+
+
+
+
+  document.getElementById('saveListForm').addEventListener('submit', async (event) => {
+  event.preventDefault(); // Prevent the default form submission
+
+  // const userId = '<%= userId %>'; // Get the user ID from somewhere (e.g., user session)
+  // const ingredients = '<%= recipeIngredients %>'; // Get the ingredients from the EJS template
+  // const title = '<%= recipeTitle %>';
+
+  try {
+    const response = await fetch('/shoppingList/add', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        title: '<%= recipeTitle %>',
-        ingredients: '<%= recipeIngredients %>',
-        instructions: '<%= recipeInstructions %>',
-        url: '<%= originalUrl %>', // use server-provided URL
-      }),
+      body: JSON.stringify({ title, ingredients }),
     });
 
-    // Handle any errors
-    if (!response.ok) {
-      console.error('Failed to update bookmark status');
+    if (response.ok) {
+      console.log('Ingredients saved successfully.');
+    } else {
+      console.error('Error saving ingredients.');
     }
-  });
+  } catch (error) {
+    console.error(error);
+  }
+});
+
+
 </script>
 
 
