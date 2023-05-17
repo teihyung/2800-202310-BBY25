@@ -85,9 +85,7 @@
 <div class="position-relative">
   <h3>Ingredients</h3>
   <form id="saveListForm" action="/shoppingList/add" method="post">
-    <!-- Add a hidden input field to store the userId -->
     <input type="hidden" name="userId" value="<%= userId %>">
-    <!-- Add a hidden input field to store the ingredients -->
     <input type="hidden" name="title" value="<%= recipeTitle %>">
     <input type="hidden" name="ingredients" value="<%= recipeIngredients %>"><br>
     <button type="submit" class="btn btn-primary">Save to Shopping List</button>

@@ -651,6 +651,7 @@ app.post('/shoppingList/add', sessionValidation, async(req, res) => {
           const existingListIndex = user.shoppinglist.findIndex(list => list.title === title);
 
           if (existingListIndex === -1) {
+            if (title != null && ingredients != null) {
             const result = await userCollection.updateOne(
               { email: userEmail },
               { $push: { shoppinglist: { title, ingredients } } }
@@ -658,6 +659,7 @@ app.post('/shoppingList/add', sessionValidation, async(req, res) => {
             
             console.log(result);
             res.status(200).send('List added successfully');
+            }
 
           } else {
             // List already exists
