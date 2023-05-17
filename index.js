@@ -234,8 +234,12 @@ app.post('/submitUser', async (req, res) => {
             password: hashedPassword,
             user_type: "user",
             status_user: status_user,
+
             bookmarks: [],
             search_history: [] // Add the search_history field
+
+            shoppinglist: []
+
         });
         console.log("Inserted user");
 
@@ -616,7 +620,7 @@ app.get('/recipe/:name', async (req, res) => {
   });
 
 
-
+// Random recipe's instruction page.
 app.get('/recipe_ran/:title', (req, res) => {
     try {
       const recipeTitle = req.params.title;
@@ -639,7 +643,9 @@ app.get('/recipe_ran/:title', (req, res) => {
         recipeTitle: recipe.Title, 
         recipeInstructions: recipeInstructions, 
         recipeIngredients: formattedIngredients,
-        originalUrl: req.originalUrl });
+        originalUrl: req.originalUrl,
+        userId: req.session._id
+     });
     } catch (error) {
       console.error(error);
       res.status(500).send('Error retrieving recipe instructions.');
@@ -647,6 +653,80 @@ app.get('/recipe_ran/:title', (req, res) => {
   });
   
 
+// Save the ingredients from random recipes to shopping list page.  
+app.post('/shoppingList/add', sessionValidation, async(req, res) => {
+
+    if (req.session.authenticated) {
+        try {
+
+          const {title, ingredients } = req.body; // Extract the userId and ingredients from the request body
+          const userEmail = req.session.email;
+          const user = await userCollection.findOne({ email: userEmail });
+        //   console.log(user);
+          const existingListIndex = user.shoppinglist.findIndex(list => list.title === title);
+
+          if (existingListIndex === -1) {
+            if (title != null && ingredients != null) {
+            const result = await userCollection.updateOne(
+              { email: userEmail },
+              { $push: { shoppinglist: { title, ingredients } } }
+            );
+            
+            console.log(result);
+            res.status(200).send('List added successfully');
+            }
+
+          } else {
+            // List already exists
+            res.status(400).send('List already exists');
+          }
+        } catch (error) {
+          console.log(error);
+          res.status(500).send('Internal server error');
+        }
+      } else {
+        res.status(401).send('Unauthorized');
+      }
+    });
+
+
+    app.post('/shoppingList/delete', sessionValidation, async(req, res) => {
+
+        if (req.session.authenticated) {
+            try {
+    
+              const {title, ingredients } = req.body; // Extract the userId and ingredients from the request body
+              const userEmail = req.session.email;
+              const user = await userCollection.findOne({ email: userEmail });
+            //   console.log(user);
+              const existingListIndex = user.shoppinglist.findIndex(list => list.title === title);
+    
+              if (existingListIndex !== -1) {
+                const result = await userCollection.updateOne(
+                  { email: userEmail },
+                  { $pull: { shoppinglist: { title } } }
+                );
+                
+                console.log(result);
+                res.status(200).send('List deleted successfully');
+    
+              } else {
+                // List already exists
+                res.status(400).send('List already exists');
+              }
+            } catch (error) {
+              console.log(error);
+              res.status(500).send('Internal server error');
+            }
+          } else {
+            res.status(401).send('Unauthorized');
+          }
+        });
+
+    
+
+
+  
 
   
   app.get('/shopping-list/:name', async (req, res) => {
@@ -676,7 +756,7 @@ app.get('/recipe_ran/:title', (req, res) => {
       });
   
       const completionText = completion.data.choices[0].message.content;
-      console.log(completionText); // Add this line to print the completion text
+    //   console.log(completionText); // Add this line to print the completion text
   
       const ingredientsRegex = /(\d+\..*\n?)+/g;
 
@@ -713,7 +793,6 @@ app.get('/recipe_ran/:title', (req, res) => {
       try {
         const { title, instructions, url, isBookmarked } = req.body;        
         const userEmail = req.session.email;
-        
         const user = await userCollection.findOne({ email: userEmail });
         const existingBookmarkIndex = user.bookmarks.findIndex(bookmark => bookmark.url === url);
   
@@ -892,9 +971,23 @@ app.get('/bookmarks', sessionValidation, async (req, res) => {
     }
   });
 
-app.get('/ingredientsList', sessionValidation, async (req, res) => {
+app.get('/shoppingList', sessionValidation, async (req, res) => {
     if (req.session.authenticated) {
-        res.render("ingredientsList")
+        try {
+            const userEmail = req.session.email;
+            const user = await userCollection.findOne({ email: userEmail });
+      
+            if (user) {
+            //   console.log(user.shoppinglist);
+              res.render('shoppingList', { shoppinglist: user.shoppinglist });
+            } else {
+              res.status(404).send('User not found');
+            }
+          } catch (error) {
+            console.log(error);
+            res.status(500).send('Internal server error');
+          }
+
     } else {
         res.status(401).send('Unauthorized');
     }

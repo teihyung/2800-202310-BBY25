@@ -1,4 +1,16 @@
 <%- include("templates/header") %>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
+<!-- Add custom CSS for background image and text -->
+<style>
+  body {
+    font-family: 'Roboto', sans-serif;
+    background-image: url('/img/background.jpg');
+    background-size: cover;
+    background-position: center;
+  }
+
+  </style>
 <div class="container py-4">
   <%- include("templates/searchBar", { searchHistory: searchHistory }) %>
  
