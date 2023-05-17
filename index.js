@@ -858,7 +858,7 @@ app.get('/filter', async (req, res) => {
 app.post('/filter', async (req, res) => {
     const { servings, time, cuisine, spicy } = req.body;
     const messages = [
-        { role: 'system', content: 'You are a helpful assistant that suggests recipes based on given filters.' },
+        { role: 'system', content: 'You are a helpful assistant that suggests name of foods based on given filters.' },
         { role: 'user', content: `For week for lunch and dinner, Give me a list of some food that is ${cuisine} cuisine, ${spicy} spicy, for ${servings} servings, and within ${time} cooking time.` },
     ];
 
