@@ -51,16 +51,18 @@
 <script src="/path/to/spinner.js"></script>
 <div class="container mt-4">
   <div class="content-wrapper">
-    <div class="position-relative">
-  <h1 class="mb-4">
-    <%= name %>
-      <a href="/bookmarked" class="bookmark-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-bookmark" viewBox="0 0 16 16">
-          <path fill="currentColor" d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5V2zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1H4z"/>
-        </svg>
-      </a>
-    </div>
-  </h1>
+    <h1 class="mb-4">
+      <%= name %>
+      <% if (!isBookmarksPage) { %>
+        <div class="mt-auto align-self-end">
+          <a href="/bookmarked" class="bookmark-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-bookmark" viewBox="0 0 16 16">
+              <path fill="black" d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5V2zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1H4z"/>
+            </svg>
+          </a>
+        </div>
+      <% } %>
+    </h1>
   <h2>Instructions</h2>
   <!-- Add this inside the recipe.ejs file -->
 <a href="/shopping-list/<%= encodeURIComponent(name) %>?userIngredients=<%= encodeURIComponent(userIngredients) %>" class="btn btn-primary">View Shopping List</a>
@@ -75,23 +77,25 @@
 </div>
 
 <style>
-  .bookmarked svg {
-    /* 북마크가 되었을 때의 스타일 */
-    color: red;
-    fill: red;
-  }
-
-  .bi-bookmark-fill svg  {
-    /* 아이콘을 채우는 스타일 */
-    fill: red;
-  }
-  .filled svg  {
-  fill: red;
+.bookmarked svg {
+  /* 북마크가 되었을 때의 스타일 */
+  fill: black;
+}
+.bi-bookmark-fill svg  {
+  /* 아이콘을 채우는 스타일 */
+  fill: black;
+}
+.filled svg  {
+  fill: black;
 }
 </style>
 
 <script>
   const bookmarkIcon = document.querySelector('.bookmark-icon');
+  const bookmarkIconSvg = bookmarkIcon.querySelector('svg');
+  const bookmarkIconSvgPath = bookmarkIconSvg.querySelector('path');
+  const isBookmarked = bookmarkIcon.classList.contains('bookmarked');
+
   bookmarkIcon.addEventListener('click', async function (event) {
     event.preventDefault(); // Prevents the default behavior of the link
 
@@ -100,13 +104,10 @@
     // Check if the recipe is bookmarked after the icon is toggled
     const isBookmarked = bookmarkIcon.classList.contains('bookmarked');
 
-    const bookmarkIconSvg = bookmarkIcon.querySelector('svg');
-    const bookmarkIconSvgPath = bookmarkIconSvg.querySelector('path');
-
     if (isBookmarked) {
-      bookmarkIconSvgPath.setAttribute('fill', 'red'); // fill the bookmark
+      bookmarkIconSvgPath.setAttribute('d', 'M2 2v13.5a.5.5 0 0 0 .74.439L8 13.069l5.26 2.87A.5.5 0 0 0 14 15.5V2a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z'); // Change the 'd' attribute to the new icon path
     } else {
-      bookmarkIconSvgPath.setAttribute('fill', 'currentColor'); // unfill the bookmark
+      bookmarkIconSvgPath.setAttribute('d', 'M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5V2zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1H4z'); // Change the 'd' attribute back to the original icon path
     }
 
     // Send a request to the server to add or remove the bookmark
@@ -119,6 +120,7 @@
         title: '<%= name %>',
         instructions: '<%= instructions %>',
         url: '<%= originalUrl %>', // use server-provided URL
+        isBookmarked: true
       }),
     });
 
@@ -127,7 +129,17 @@
       console.error('Failed to update bookmark status');
     }
   });
+
+  // Update the bookmark icon appearance based on the initial bookmarked state
+  if (isBookmarked) {
+    bookmarkIconSvgPath.setAttribute('d', 'M2 2v13.5a.5.5 0 0 0 .74.439L8 13.069l5.26 2.87A.5.5 0 0 0 14 15.5V2a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z');
+  } else {
+    bookmarkIconSvgPath.setAttribute('d', 'M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5V2zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1H4z');
+  }
 </script>
+
+
+
 
 
 <%- include("templates/footer") %>

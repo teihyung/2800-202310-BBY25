@@ -611,7 +611,8 @@ app.get('/recipe/:name', async (req, res) => {
         name: recipeName,
         instructions: instructionsText,
         userIngredients: req.query.userIngredients || '',
-        originalUrl: req.originalUrl
+        originalUrl: req.originalUrl,
+        isBookmarksPage: false
       });
     } catch (error) {
       console.log(error);
@@ -958,7 +959,10 @@ app.get('/bookmarks', sessionValidation, async (req, res) => {
         const user = await userCollection.findOne({ email: userEmail });
   
         if (user) {
-          res.render('bookmarks', { bookmarks: user.bookmarks });
+          res.render('bookmarks', { 
+            bookmarks: user.bookmarks,
+            isBookmarksPage: true  // Add this line
+        });
         } else {
           res.status(404).send('User not found');
         }
