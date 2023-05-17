@@ -1,0 +1,60 @@
+<%- include("templates/header") %>
+
+<!-- Add Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
+<!-- Add custom CSS for background image and text -->
+<style>
+    body {
+        font-family: 'Roboto', sans-serif;
+        background-image: url('/img/background.jpg');
+        background-size: cover;
+        background-position: center;
+    }
+
+    .content-wrapper {
+        background-color: rgba(255, 255, 255, 0.8);
+        padding: 20px;
+        border-radius: 15px;
+    }
+
+    h2 {
+        font-weight: 700;
+    }
+
+    a {
+        text-decoration: none;
+    }
+
+    a:hover {
+        text-decoration: underline;
+    }
+
+    .list-group-item-custom {
+        background-color: rgba(255, 204, 0, 0.5);
+    }
+</style>
+
+<!-- Add this inside your HTML body -->
+<div id="loading-spinner" style="display: none;">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+
+<% if (recipes.length > 0) { %>
+    <div class="container mt-5">
+        <div class="content-wrapper">
+            <h2>Recipes</h2>
+            <ul class="list-group">
+                <% recipes.forEach(function(recipe) { %>
+                    <li class="list-group-item list-group-item-custom">
+                        <a href="/recipe/<%= encodeURIComponent(recipe) %>"><%= recipe %></a>
+                    </li>
+                <% }); %>
+            </ul>
+        </div>
+    </div>
+<% } %>
+
+<%- include("templates/footer") %>
