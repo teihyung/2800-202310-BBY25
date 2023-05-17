@@ -645,7 +645,8 @@ app.get('/recipe_ran/:title', (req, res) => {
         recipeInstructions: recipeInstructions, 
         recipeIngredients: formattedIngredients,
         originalUrl: req.originalUrl,
-        userId: req.session._id
+        userId: req.session._id,
+        isBookmarksPage: false 
      });
     } catch (error) {
       console.error(error);
