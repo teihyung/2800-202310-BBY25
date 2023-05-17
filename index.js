@@ -236,7 +236,7 @@ app.post('/submitUser', async (req, res) => {
             status_user: status_user,
 
             bookmarks: [],
-            search_history: [] // Add the search_history field
+            search_history: [], // Add the search_history field
 
             shoppinglist: []
 
