@@ -993,6 +993,36 @@ app.get('/shoppingList', sessionValidation, async (req, res) => {
     }
 });
 
+app.get('/filter', async (req, res) => {
+    res.render("filter");
+});
+
+app.post('/filter', async (req, res) => {
+    const { servings, time, cuisine, spicy } = req.body;
+    const messages = [
+        { role: 'system', content: 'You are a helpful assistant that suggests name of foods based on given filters.' },
+        { role: 'user', content: `For week for lunch and dinner, Give me a list of some food that is ${cuisine} cuisine, ${spicy} spicy, for ${servings} servings, and within ${time} cooking time.` },
+    ];
+
+    try {
+        const completion = await openai.createChatCompletion({
+            model: 'gpt-3.5-turbo',
+            messages: messages,
+        });
+
+        const completionText = completion.data.choices[0].message.content;
+        const recipes = completionText.split('\n').filter(recipe => recipe.trim() !== '');
+        res.render('filteredRecommendation', { recipes: recipes });
+    } catch (error) {
+        console.log(error);
+        res.status(500).send('Error retrieving recipe recommendations.');
+    }
+});
+
+app.get('/filteredRecommendation', async (req, res) => {
+    res.render("filteredRecommendation");
+});
+
 app.use(express.static(__dirname + "/public"));
 
 app.get("*", (req, res) => {
