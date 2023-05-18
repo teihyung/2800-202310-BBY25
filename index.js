@@ -655,7 +655,8 @@ app.get('/recipe_ran/:title', (req, res) => {
         recipeInstructions: recipeInstructions, 
         recipeIngredients: formattedIngredients,
         originalUrl: req.originalUrl,
-        userId: req.session._id
+        userId: req.session._id,
+        isBookmarksPage: false 
      });
     } catch (error) {
       console.error(error);
@@ -683,21 +684,21 @@ app.post('/shoppingList/add', sessionValidation, async(req, res) => {
               { $push: { shoppinglist: { title, ingredients } } }
             );
             
-            console.log(result);
-            res.status(200).send('List added successfully');
-            }
+            res.status(200).send('List added successfully.');
 
           } else {
-            // List already exists
-            res.status(400).send('List already exists');
+            res.status(400).send('Invalid title or ingredients.');
           }
-        } catch (error) {
-          console.log(error);
-          res.status(500).send('Internal server error');
+        } else {
+          res.status(400).send('List already exists.');
         }
-      } else {
-        res.status(401).send('Unauthorized');
+      } catch (error) {
+        console.log('Internal server error:', error);
+        res.status(500).send('Internal server error');
       }
+    } else {
+      res.sendStatus(401);
+    }
     });
 
 
