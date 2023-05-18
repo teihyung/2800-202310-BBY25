@@ -189,7 +189,7 @@
       },
       body: JSON.stringify({
         title: '<%= recipeTitle %>',
-        instructions: true,
+        instructions: <%- JSON.stringify(recipeInstructions) %>,
         url: '<%= originalUrl %>',
         isBookmarked: true
       }),
