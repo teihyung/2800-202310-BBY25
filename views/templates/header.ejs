@@ -26,6 +26,13 @@
       margin-left: 40px;
       margin-top: -25px;
     }
+    #chefHat {
+      position: absolute;
+      height: 55px;
+      width: 55px;
+      margin-left: 40px;
+      margin-top: -25px;
+    }
 
     .logo-container {
       margin-right: 55px;
@@ -74,6 +81,7 @@
         <div class="navbar d-flex flex-wrap justify-content-lg-start">
           <div class="logo-container">
             <img src="/img/favicon.png" alt="KitchenGenie Logo" class="logo" />
+            <img id="chefHat" src="/img/logo_hat.png" alt="Chef Hat" style="display: none;"/>
           </div>
           <div class="title-container" >
             <span class="fs-2" style="margin-left: 1.5em">KitchenGenie</span>
@@ -183,3 +191,38 @@
   </header>
 
   <div class="container">
+    <script>
+      window.onload = function() {
+        // Get the references to both the logo and chefHat
+        var logo = document.querySelector('.logo');
+        var chefHat = document.getElementById('chefHat');
+    
+        // Hide the chefHat initially
+        chefHat.style.display = 'none';
+    
+        // Toggle visibility when the logo is clicked
+        logo.addEventListener('click', function() {
+          if(chefHat.style.display === 'none') {
+            chefHat.style.display = 'block';
+            logo.style.display = 'none';
+          } else {
+            chefHat.style.display = 'none';
+            logo.style.display = 'block';
+          }
+        });
+    
+        // Toggle visibility when the chefHat is clicked
+        chefHat.addEventListener('click', function() {
+          if(logo.style.display === 'none') {
+            logo.style.display = 'block';
+            chefHat.style.display = 'none';
+          } else {
+            logo.style.display = 'none';
+            chefHat.style.display = 'block';
+          }
+        });
+      }
+    </script>
+    
+    
+    
