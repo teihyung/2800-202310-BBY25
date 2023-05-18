@@ -438,10 +438,27 @@ function getRandomRecipes(data, count) {
 
   let randomRecipes;
 
+  app.get('/hat', (req, res) => {
+    res.render('hat');  // Render the "hat" view
+});
+
+  
+  
   app.get('/members', async (req, res) => {
     if (req.session.authenticated) {
         try {    
             const ingredient = req.query.ingredient;
+
+
+            if (ingredient === "hat") {
+              // Redirect to a different route
+              res.redirect('/hat');
+              return;
+          }
+
+
+
+
 
             // Retrieve the user's search history from the database
             const result = await userCollection.findOne({ email: req.session.email });
