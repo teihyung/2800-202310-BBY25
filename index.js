@@ -733,12 +733,6 @@ app.post('/shoppingList/add', sessionValidation, async(req, res) => {
           }
         });
 
-    
-
-
-  
-
-  
  
 
   app.post('/bookmarks/add', sessionValidation, async (req, res) => {
@@ -802,28 +796,7 @@ app.post('/shoppingList/add', sessionValidation, async(req, res) => {
     }
   });
 
-//   app.get('/bookmarks/:email', sessionValidation, async (req, res) => {
-//     if (req.session.authenticated) {
-//       try {
-//         const email = req.params.email;
-//         const user = await userCollection.findOne({ email });
-  
-//         if (user) {
-//           // Render the bookmarks page with the user's bookmarks
-//           res.render('bookmarks', { bookmarks: user.bookmarks });
-//         } else {
-//           res.status(404).send('User not found');
-//         }
-//       } catch (error) {
-//         console.log(error);
-//         res.status(500).send('Internal server error');
-//       }
-//     } else {
-//       res.status(401).send('Unauthorized');
-//     }
-//   });
 
- 
 
 app.get('/change_password', (req, res) => {
     if(!req.session.forgotPassword){
@@ -862,48 +835,6 @@ app.post('/change_password', async (req, res) => {
 });
 
 
-
-// app.post('/bookmarks', sessionValidation, async (req, res) => {
-//     if (!req.session.authenticated) {
-//         return res.status(403).send('Not authenticated');
-//     }
-
-//     try {
-//         const {title} = req.body;
-        
-//         await database.db(mongodb_database).collection('bookmarks').insertOne({
-//             userId: req.session.userId,
-//             title: title
-//         });
-
-//         res.status(200).send('Bookmarked');
-//     } catch (error) {
-//         console.log(error);
-//         res.status(500).send('Error bookmarking recipe');
-//     }
-// });
-
-// app.delete('/bookmarks', sessionValidation, async (req, res) => {
-//     if (!req.session.authenticated) {
-//       return res.status(403).send('Not authenticated');
-//     }
-  
-//     try {
-//       const { title } = req.body;
-  
-//       await database.db(mongodb_database).collection('bookmarks').deleteOne({
-//         userId: req.session.userId,
-//         title: title
-//       });
-  
-//       res.status(200).send('Unbookmarked');
-//     } catch (error) {
-//       console.log(error);
-//       res.status(500).send('Error unbookmarking recipe');
-//     }
-//   });
-
-
 app.get('/bookmarks', sessionValidation, async (req, res) => {
     if (req.session.authenticated) {
       try {
@@ -926,6 +857,60 @@ app.get('/bookmarks', sessionValidation, async (req, res) => {
       res.status(401).send('Unauthorized');
     }
   });
+
+  app.get('/bookmarks_page', sessionValidation, async (req, res) => {
+    if (req.session.authenticated) {
+        try {
+            const userEmail = req.session.email;
+            const user = await userCollection.findOne({ email: userEmail });
+      
+            if (user) {
+            res.render('bookmarks', { 
+              bookmarks: user.bookmarks,
+              isBookmarksPage: true 
+          });            
+        } else {
+              res.status(404).send('User not found');
+            }
+          } catch (error) {
+            console.log(error);
+            res.status(500).send('Internal server error');
+          }
+
+    } else {
+        res.status(401).send('Unauthorized');
+    }
+});
+
+app.get('/bookmarks_page/:title', sessionValidation, async (req, res) => {
+  if (req.session.authenticated) {
+    try {
+      const userEmail = req.session.email;
+      const bookmarkTitle = req.params.title;
+      const user = await userCollection.findOne({ email: userEmail });
+
+      if (user) {
+        const bookmark = user.bookmarks.find(bookmark => bookmark.title === bookmarkTitle);
+        if (bookmark) {
+          res.render('bookmarks_page', { bookmark });
+        } else {
+          res.status(404).send('Bookmark not found');
+        }
+      } else {
+        res.status(404).send('User not found');
+      }
+    } catch (error) {
+      console.log(error);
+      res.status(500).send('Internal server error');
+    }
+  } else {
+    res.status(401).send('Unauthorized');
+  }
+});
+
+
+
+
 
 app.get('/shoppingList', sessionValidation, async (req, res) => {
     if (req.session.authenticated) {
