@@ -88,18 +88,17 @@
 
 <div class="position-relative">
   <h3>Ingredients</h3>
-  <form id="saveListForm" action="/shoppingList/add" method="post">
     <input type="hidden" name="userId" value="<%= userId %>">
     <input type="hidden" name="title" value="<%= recipeTitle %>">
-    <input type="hidden" name="ingredients" value="<%= recipeIngredients %>"><br>
-    <button type="submit" class="btn btn-primary">Save to Shopping List</button>
-  </form><br>
+    <input type="hidden" name="ingredients" value="<%= recipeIngredients %>">
+    <!-- <% console.log(recipeIngredients) %> -->
+    <div class="d-flex justify-content-end">
+    <button id="saveToListButton" class="btn btn-primary">Add to Shopping List</button></div><br>
 
   <ul class="list-group instructions-list">
       <% const ingredientsArray = recipeIngredients.split('\n'); %>
       <% for (let ingredient of ingredientsArray) { %>
         <% const words = ingredient.trim().split(' '); %>
-        <% console.log(words) %>
         <% if ((words.length >= 2 && !words[0].includes('ed') && !words[1].includes('ed'))) { %>
           <li class="list-group-item list-group-item-custom"><%= ingredient %></li>
         <% } %>
@@ -113,11 +112,49 @@
     <li class="list-group-item list-group-item-custom"><%= index + 1 %>. <%= instruction %></li>
   <% }); %>
 </ol><br><br>
-
   </div>
 </div>
 
 <script>
+
+
+    document.getElementById('saveToListButton').addEventListener('click', function(event) {
+    event.preventDefault(); // Prevent the default form submission behavior
+
+    const title = document.querySelector('input[name="title"]').value;
+    const ingredients = document.querySelector('input[name="ingredients"]').value;
+
+    const confirmation = confirm("Are you sure you want to add this list?");
+    if (confirmation) {
+      fetch('/shoppingList/add', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ title, ingredients }),
+      })
+        .then(response => {
+          if (response.ok) {
+            console.log('List added successfully.');
+            const saveButton = document.getElementById('saveToListButton');
+            saveButton.textContent = 'Saved';
+            saveButton.disabled = true;
+          } else {
+            console.error('Error adding list.');
+            window.alert('List already exists.');
+          }
+        })
+        .catch(error => {
+          console.error('An error occurred:', error);
+          window.alert('An error occurred. Please try again.');
+        });
+    }
+  });
+
+  </script>
+
+
+  <script>
 
 
   const bookmarkIcon = document.querySelector('.bookmark-icon');
@@ -164,16 +201,17 @@
     }
   });
 
-  // Update the bookmark icon appearance based on the initial bookmarked state
-  if (isBookmarked) {
-    bookmarkIconSvgPath.setAttribute('d',
-      'M2 2v13.5a.5.5 0 0 0 .74.439L8 13.069l5.26 2.87A.5.5 0 0 0 14 15.5V2a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z'
-    );
-  } else {
-    bookmarkIconSvgPath.setAttribute('d',
-      'M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5V2zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1H4z'
-    );
-  }
+// Update the bookmark icon appearance based on the initial bookmarked state
+if (isBookmarked) {
+  bookmarkIconSvgPath.setAttribute('d',
+    'M2 2v13.5a.5.5 0 0 0 .74.439L8 13.069l5.26 2.87A.5.5 0 0 0 14 15.5V2a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z'
+  );
+} else {
+  bookmarkIconSvgPath.setAttribute('d',
+    'M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5V2zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1H4z'
+  );
+}
+
 
 
 </script>
