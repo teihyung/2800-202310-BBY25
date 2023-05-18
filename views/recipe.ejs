@@ -67,9 +67,7 @@
       <% }); %>
     </ul>
      
-     
-   
-  </h1>
+    
   <h2 class="mt-4">Instructions</h2>
     <ul class="list-group instructions-list">
       <% instructions.forEach(function(step) { %>
@@ -137,6 +135,7 @@
 
 
 
+ 
 
   function checkIfSaved(recipeName) {
   const savedRecipes = JSON.parse(localStorage.getItem('savedRecipes')) || [];
@@ -194,36 +193,8 @@ saveToShoppingListButton.addEventListener('click', async () => {
   }
 });
 
-async function deleteList(title) {
-  const confirmation = confirm("Are you sure you want to delete this list?");
-  if (confirmation) {
-    try {
-      const response = await fetch('/shoppingList/delete', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ title }),
-      });
 
-      if (response.ok) {
-        const jsonResponse = await response.json(); // Parse the JSON response
-        const deletedListTitle = jsonResponse.deletedListTitle;
-        console.log('List deleted successfully:', deletedListTitle);
 
-        // Remove the deleted list from the UI
-        const listElement = document.querySelector(`.title[data-title="${deletedListTitle}"]`);
-        if (listElement) {
-          listElement.remove();
-        }
-      } else {
-        console.error('Error deleting list.');
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  }
-}
 // Check if the list was deleted and update the button
 window.addEventListener('load', () => {
   const listDeleted = localStorage.getItem('listDeleted');
@@ -232,7 +203,6 @@ window.addEventListener('load', () => {
     saveToShoppingListButton.disabled = false;
     saveToShoppingListButton.classList.add('btn-primary');
     saveToShoppingListButton.classList.remove('btn-success');
-
     // Remove the flag from local storage
     localStorage.removeItem('listDeleted');
   }
