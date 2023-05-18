@@ -674,7 +674,6 @@ app.post('/shoppingList/add', sessionValidation, async(req, res) => {
           const {title, ingredients } = req.body; // Extract the userId and ingredients from the request body
           const userEmail = req.session.email;
           const user = await userCollection.findOne({ email: userEmail });
-        //   console.log(user);
           const existingListIndex = user.shoppinglist.findIndex(list => list.title === title);
 
           if (existingListIndex === -1) {
@@ -710,7 +709,6 @@ app.post('/shoppingList/add', sessionValidation, async(req, res) => {
               const {title, ingredients } = req.body; // Extract the userId and ingredients from the request body
               const userEmail = req.session.email;
               const user = await userCollection.findOne({ email: userEmail });
-            //   console.log(user);
               const existingListIndex = user.shoppinglist.findIndex(list => list.title === title);
     
               if (existingListIndex !== -1) {
@@ -719,7 +717,7 @@ app.post('/shoppingList/add', sessionValidation, async(req, res) => {
                   { $pull: { shoppinglist: { title } } }
                 );
                 
-                console.log(result);
+                // console.log(result);
                 res.status(200).json({ message: 'List deleted successfully', deletedListTitle: title });
     
               } else {
