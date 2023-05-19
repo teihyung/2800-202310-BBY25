@@ -36,33 +36,14 @@ const openaiConfiguration = new Configuration({
 });
 const openai = new OpenAIApi(openaiConfiguration);
 
+
+
+
+
+
 app.get('/', (req, res) => {
     res.render("main");
 });
-
-app.get('/recipe/:name', async (req, res) => {
-    const recipeName = req.params.name;
-
-    const messages = [
-        { role: 'system', content: 'You are a helpful assistant that provides detailed instructions for a given recipe.' },
-        { role: 'user', content: `How do I make ${recipeName}?` },
-    ];
-
-    try {
-        const completion = await openai.createChatCompletion({
-            model: 'gpt-3.5-turbo',
-            messages: messages,
-        });
-
-        const completionText = completion.data.choices[0].message.content;
-        res.render('recipe', { name: recipeName, instructions: completionText });
-    } catch (error) {
-        console.log(error);
-        res.status(500).send('Error retrieving recipe instructions.');
-    }
-});
-
-
 
 /* secret information section */
 const mongodb_host = process.env.MONGODB_HOST;
@@ -81,6 +62,8 @@ const userCollection = database.db(mongodb_database).collection('users');
 app.set('view engine', 'ejs');
 
 app.use(express.urlencoded({extended: false}));
+app.use("/img", express.static("./img"));
+
 
 var mongoStore = MongoStore.create({
     mongoUrl: `mongodb+srv://${mongodb_user}:${mongodb_password}@${mongodb_host}/sessions`,
@@ -99,10 +82,11 @@ app.use(session({
 
 
 async function saveResetCode(email, code) {
+    const expirationTime = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes from now
     // Update the user's document in MongoDB with the reset code
     await userCollection.updateOne(
         { email: email },
-        { $set: { resetCode: code } }
+        { $set: { resetCode: code, resetCodeExpiration: expirationTime } }
     );
 }
 
@@ -227,7 +211,6 @@ app.post('/submitUser', async (req, res) => {
     var password = req.body.password;
     var status_user = req.body.status;
 
-
     const schema = Joi.object(
         {
             email: Joi.string().email().required(),
@@ -244,20 +227,33 @@ app.post('/submitUser', async (req, res) => {
 
     var hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    await userCollection.insertOne({
-        email: email,
-        username: username,
-        password: hashedPassword,
-        user_type: "user",
-        status_user: status_user
-    });
-    console.log("Inserted user");
+    try {
+        await userCollection.insertOne({
+            email: email,
+            username: username,
+            password: hashedPassword,
+            user_type: "user",
+            status_user: status_user,
 
-    req.session.authenticated = true;
-    req.session.email = email;
-    req.session.cookie.maxAge = expireTime;
-    res.redirect('/members');
+            bookmarks: [],
+            search_history: [], // Add the search_history field
+
+            shoppinglist: []
+
+        });
+        console.log("Inserted user");
+
+        req.session.authenticated = true;
+        req.session.email = email;
+        req.session.cookie.maxAge = expireTime;
+        res.redirect('/members');
+    } catch (error) {
+        console.error("Failed to insert user: ", error);
+        // Handle the error here. You may want to redirect to an error page or show a message to the user.
+        res.status(500).send("Error creating user.");
+    }
 });
+
 
 app.post('/loggingin', async (req, res) => {
     var email = req.body.email;
@@ -281,7 +277,7 @@ app.post('/loggingin', async (req, res) => {
     const result = await userCollection.find({email: email}).project({email: 1, password: 1, user_type: 1}).toArray();
     // const user = await userCollection.findOne({ username });
 
-    if (result.length != 1) {
+    if (result.length !== 1) {
         console.log("user not found");
         res.redirect("/wrongPw");
         return;
@@ -356,10 +352,19 @@ app.post('/forgot-password', async (req, res) => {
     }
 });
 
-app.get('/reset-password', (req, res) => {
+app.get('/reset-password', async (req, res) => {
     if (req.session.forgotPassword) {
         // User not authorized, redirect to an error page or appropriate route
         return res.redirect('/error');
+    }
+
+    const user = await findUserByEmail(req.session.email);
+
+    if (!user || user.resetCodeExpiration < new Date()) {
+        // Invalid or expired reset code
+        const error = 'Invalid or expired reset code';
+        console.log('Error:', error);
+        return res.render('reset-password', { error });
     }
     res.render("reset-password");
 });
@@ -372,11 +377,10 @@ app.post('/reset-password', async (req, res) => {
     // Check if the user exists in the database
     const user = await findUserByEmail(req.session.email);
     user.resetCode = code;
+    console.log(user.resetCodeExpiration);
+    console.log(new Date());
 
-    // console.log('Entered code:', code);
-    // console.log('Saved reset code:', user.resetCode);
-
-    if (user && user.resetCode === code) {
+    if (user && user.resetCode === code && user.resetCodeExpiration > new Date()) {
         // User exists and the entered code matches the saved reset code
         res.redirect('/change_password');
     } else {
@@ -416,7 +420,7 @@ function getRandomRecipes(data, count) {
     return new Promise((resolve, reject) => {
     const csvFilePath = 'dataset.csv';
     const data = [];
-  
+
     fs.createReadStream(csvFilePath)
       .pipe(csv())
       .on('data', (row) => {
@@ -431,36 +435,63 @@ function getRandomRecipes(data, count) {
       });
     })
   }
-    
+
+  let randomRecipes;
+
+  app.get('/kitchenGenie', (req, res) => {
+    res.render('kitchenGenie');  // Render the "Genie" view
+});
+
+  
+  
   app.get('/members', async (req, res) => {
     if (req.session.authenticated) {
         try {    
-              
-           const ingredient = req.query.ingredient;
+            const ingredient = req.query.ingredient;
 
-           const result = await userCollection.find({email: req.session.email}).project({
-            username: 1}).toArray();
 
-        const userData = {
-            username: result[0].username
-        }
-  
+            if (ingredient === "kitchenGenie") {
+              // Redirect to a different route
+              res.redirect('/kitchenGenie');
+              return;
+          }
+
+            // Retrieve the user's search history from the database
+            const result = await userCollection.findOne({ email: req.session.email });
+          
+            const userData = {
+                username: result.username,
+                search_history: result.search_history
+            };
+            
             if (!ingredient) {
                 try {
-                    const randomRecipes = await getRandomRecipeSuggestions(); 
-                    res.render('index', { userData, randomRecipes: randomRecipes });
+                    randomRecipes = await getRandomRecipeSuggestions(); 
+                   
+                    res.render('index', {
+                        userData: userData,
+                        randomRecipes: randomRecipes,
+                        searchHistory: userData.search_history
+                      });
+                    
+ 
                     console.log(req.session.username);
-  
                 } catch (error) {
                     console.error(error);
                     res.status(500).send('Error retrieving random recipe suggestions.');
                 }
                 return;
-            }      
-  
+            }
+
+            // Update the user's search history in the database
+            await userCollection.updateOne(
+                { email: req.session.email },
+                { $addToSet: { search_history: ingredient } }
+            );
+
             const messages = [
                 { role: 'system', content: 'You are a helpful assistant that suggests recipes based on given ingredients.' },
-                { role: 'user', content: `Give me some recipes with ${ingredient}.` },
+                { role: 'user', content: `Give me some recipe options with ${ingredient}. Only the names please` },
             ];
   
             try {
@@ -468,25 +499,28 @@ function getRandomRecipes(data, count) {
                     model: 'gpt-3.5-turbo',
                     messages: messages,
                 });
-  
+
                 const completionText = completion.data.choices[0].message.content;
                 const recipes = completionText.split('\n').filter(recipe => recipe.trim() !== '');
-                res.render('search', { recipes: recipes });
+                res.render('search', { userData, recipes: recipes }); // Send the user's search history to the frontend
             } catch (error) {
                 console.log(error);
-                res.status(500).send('Error retrieving recipes.');
+                next(error); // Pass the error to the error handling middleware
             }
             return;
         } catch (error) {
             console.log(error);
             res.redirect('/login');
         }
-  
     } else {
         res.redirect('/login');
         return;
     }
-  });
+});
+
+  app.use((error, req, res, next) => {
+    res.status(500).render('error', { error: error.message });
+});
 
 
 app.get('/profile', async (req, res) => {
@@ -543,31 +577,239 @@ app.post('/saveProfile', async (req, res) => {
     }
 });
 
+app.get('/recipe/:name', async (req, res) => {
+ 
 
-app.post('/bookmarks/add', sessionValidation, async (req, res) => {
+  const recipeName = req.params.name.replace(/^\d+\.\s*/, '');
+  const userIngredients = req.query.userIngredients
+    ? req.query.userIngredients.split(',')
+    : [];
+
+  const messages = [
+    {
+      role: 'system',
+      content:
+        'You are a helpful assistant that provides detailed instructions for a given recipe.',
+    },
+    {
+      role: 'user',
+      content: `Provide a list of ingredients and step-by-step instructions on how to make ${recipeName}. Please have the number before each line. No blank line between two items.`,
+    },
+  ];
+
+  try {
+    const completion = await openai.createChatCompletion({
+      model: 'gpt-3.5-turbo',
+      messages: messages,
+    });
+
+    const completionText = completion.data.choices[0].message.content;
+    const itemsRegex = /(\d+\..*\n?)+/g;
+
+    const itemsMatch = completionText.match(itemsRegex);
+
+    if (!itemsMatch) {
+      res.status(500).send('Error retrieving items from the completion text.');
+      return;
+    }
+
+    const ingredientsText = itemsMatch[0].trim().split('\n');
+    const shoppingList = ingredientsText.filter(
+      (ingredient) => !userIngredients.includes(ingredient)
+    );
+
+    const instructionsText = itemsMatch[1].trim().split('\n').filter((line) => line.trim() !== '');
+
+    const instructions = [];
+
+    instructionsText.forEach((line) => {
+      const stepMatch = line.match(/^\d+/);
+      if (stepMatch) {
+        const currentStep = parseInt(stepMatch[0]);
+        const instruction = line.replace(/^\d+\.\s/, '').trim();
+        instructions.push({ step: currentStep, instruction });
+      }
+    });
+
+    res.render('recipe', {
+      name: recipeName,
+      shoppingList: shoppingList,
+      instructions: instructionsText,
+      userIngredients: req.query.userIngredients || '',
+      originalUrl: req.originalUrl,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send('Error retrieving recipe instructions.');
+  }
+});
+
+// Random recipe's instruction page.
+app.get('/recipe_ran/:title', (req, res) => {
+    try {
+      const recipeTitle = req.params.title;
+  
+      // Find the recipe with matching title from the randomRecipes variable
+      const recipe = randomRecipes.find(recipe => recipe.Title === recipeTitle);
+  
+      if (!recipe) {
+        res.status(404).send('Recipe not found.');
+        return;
+      }
+  
+      const recipeInstructions = recipe.Instructions.split('\n').filter(instruction => instruction.trim() !== '');
+      const recipeIngredients = recipe.Ingredients.split(',').map(ingredient => ingredient.trim());
+      const formattedIngredients = recipeIngredients.join('\n').replace(/[\[\]']/g, '').replace(/plus more|and/g, '');
+  
+      // Render the 'recipe' template and pass the recipeTitle, recipeInstructions, and recipeIngredients variables
+      res.render('random_recipe', { 
+        recipeImage: recipe.Image_Name, 
+        recipeTitle: recipe.Title, 
+        recipeInstructions: recipeInstructions, 
+        recipeIngredients: formattedIngredients,
+        originalUrl: req.originalUrl,
+        userId: req.session._id,
+        isBookmarksPage: false 
+     });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Error retrieving recipe instructions.');
+    }
+  });
+  
+
+// Save the ingredients from random recipes to shopping list page.  
+app.post('/shoppingList/add', sessionValidation, async(req, res) => {
+
     if (req.session.authenticated) {
         try {
-            const {title, url} = req.body;   // ???
-            const userId = req.session.userId;
 
-            await database.db(mongodb_database).collection('bookmarks').insertOne({
-                    username: username,
-                    title: title,
-                    url: url
-                }
+          const {title, ingredients } = req.body; // Extract the userId and ingredients from the request body
+          const userEmail = req.session.email;
+          const user = await userCollection.findOne({ email: userEmail });
+          const existingListIndex = user.shoppinglist.findIndex(list => list.title === title);
+
+          if (existingListIndex === -1) {
+            if (title != null && ingredients != null) {
+            const result = await userCollection.updateOne(
+              { email: userEmail },
+              { $push: { shoppinglist: { title, ingredients } } }
             );
-            console.log("Inserted user");
+            
+            res.status(200).send('List added successfully.');
 
-
-            res.status(200).send('Bookmark added successfully');
-        } catch (error) {
-            console.log(error);
-            res.status(500).send('Internal server error');
+          } else {
+            res.status(400).send('Invalid title or ingredients.');
+          }
+        } else {
+          res.status(400).send('List already exists.');
         }
+      } catch (error) {
+        console.log('Internal server error:', error);
+        res.status(500).send('Internal server error');
+      }
     } else {
-        res.status(401).send('Unauthorized');
+      res.sendStatus(401);
     }
-})
+    });
+
+
+    app.post('/shoppingList/delete', sessionValidation, async(req, res) => {
+
+        if (req.session.authenticated) {
+            try {
+    
+              const {title, ingredients } = req.body; // Extract the userId and ingredients from the request body
+              const userEmail = req.session.email;
+              const user = await userCollection.findOne({ email: userEmail });
+              const existingListIndex = user.shoppinglist.findIndex(list => list.title === title);
+    
+              if (existingListIndex !== -1) {
+                const result = await userCollection.updateOne(
+                  { email: userEmail },
+                  { $pull: { shoppinglist: { title } } }
+                );
+                
+                // console.log(result);
+                res.status(200).json({ message: 'List deleted successfully', deletedListTitle: title });
+    
+              } else {
+                // List already exists
+                res.status(400).send('List already exists');
+              }
+            } catch (error) {
+              console.log(error);
+              res.status(500).send('Internal server error');
+            }
+          } else {
+            res.status(401).send('Unauthorized');
+          }
+        });
+
+ 
+
+  app.post('/bookmarks/add', sessionValidation, async (req, res) => {
+    if (req.session.authenticated) {
+      try {
+        const { title, instructions, url, isBookmarked } = req.body;        
+        const userEmail = req.session.email;
+        const user = await userCollection.findOne({ email: userEmail });
+        const existingBookmarkIndex = user.bookmarks.findIndex(bookmark => bookmark.url === url);
+  
+        if (existingBookmarkIndex === -1) {
+          // Bookmark does not exist, add it
+          const result = await userCollection.updateOne(
+            { email: userEmail },
+            { $push: { bookmarks: { title, instructions, url, isBookmarked } } }
+          );
+          
+          console.log(result);
+          res.status(200).send('Bookmark added successfully');
+        } else {
+          // Bookmark already exists
+          res.status(400).send('Bookmark already exists');
+        }
+      } catch (error) {
+        console.log(error);
+        res.status(500).send('Internal server error');
+      }
+    } else {
+      res.status(401).send('Unauthorized');
+    }
+  });
+
+  app.post('/bookmarks/remove', sessionValidation, async (req, res) => {
+    if (req.session.authenticated) {
+      try {
+        const { url } = req.body;        
+        const userEmail = req.session.email;
+        
+        const user = await userCollection.findOne({ email: userEmail });
+        const existingBookmarkIndex = user.bookmarks.findIndex(bookmark => bookmark.url === url);
+  
+        if (existingBookmarkIndex !== -1) {
+          // Bookmark exists, remove it
+          const result = await userCollection.updateOne(
+            { email: userEmail },
+            { $pull: { bookmarks: { url } } }
+          );
+          
+          console.log(result);
+          res.status(200).send('Bookmark removed successfully');
+        } else {
+          // Bookmark does not exist
+          res.status(400).send('Bookmark does not exist');
+        }
+      } catch (error) {
+        console.log(error);
+        res.status(500).send('Internal server error');
+      }
+    } else {
+      res.status(401).send('Unauthorized');
+    }
+  });
+
+
 
 app.get('/change_password', (req, res) => {
     if(!req.session.forgotPassword){
@@ -581,43 +823,158 @@ app.post('/change_password', async (req, res) => {
     const { password, confirmPassword } = req.body;
     const email = req.session.email;
 
+    const user = await findUserByEmail(email);
+    const previousPassword = user.password;
+
     if (password === confirmPassword) {
+        const isSameOldPassword = await bcrypt.compare(password, previousPassword);
         // Passwords match
+        if (isSameOldPassword) {
+            // New password is the same as the previous password
+            const error = 'New password cannot be the same as the previous password';
+            console.log('Error:', error);
+            return res.render('change_password', { error });
+        }
         await updatePassword(email, password); // Replace 'updatePassword' with your function to update the password in the database
         req.session.destroy(); // Destroy the session so that the user can login again
         // Redirect the user to the login page or any other appropriate page
-        res.redirect('/login');
+        return res.render('login');
     } else {
         // Passwords do not match
         const error = 'Passwords do not match';
         console.log('Error:', error);
-        res.render('change_password', { error });
+        return res.render('change_password', { error });
     }
 });
+
+
 app.get('/bookmarks', sessionValidation, async (req, res) => {
     if (req.session.authenticated) {
-        //   try {
-        //     const userId = req.session.userId;
+      try {
+        const userEmail = req.session.email;
+        const user = await userCollection.findOne({ email: userEmail });
+  
+        if (user) {
+          res.render('bookmarks', { 
+            bookmarks: user.bookmarks,
+            isBookmarksPage: true  // Add this line
+        });
+        } else {
+          res.status(404).send('User not found');
+        }
+      } catch (error) {
+        console.log(error);
+        res.status(500).send('Internal server error');
+      }
+    } else {
+      res.status(401).send('Unauthorized');
+    }
+  });
 
-        //     const bookmarks = await database.db(mongodb_database).collection('bookmarks').find({ userId }).toArray();
+  app.get('/bookmarks_page', sessionValidation, async (req, res) => {
+    if (req.session.authenticated) {
+        try {
+            const userEmail = req.session.email;
+            const user = await userCollection.findOne({ email: userEmail });
+      
+            if (user) {
+            res.render('bookmarks', { 
+              bookmarks: user.bookmarks,
+              isBookmarksPage: true 
+          });            
+        } else {
+              res.status(404).send('User not found');
+            }
+          } catch (error) {
+            console.log(error);
+            res.status(500).send('Internal server error');
+          }
 
-        //     res.status(200).json(bookmarks);
-        //   } catch (error) {
-        //     console.log(error);
-        //     res.status(500).send('Internal server error');
-        //   }
-        res.render("bookmarks")
     } else {
         res.status(401).send('Unauthorized');
     }
 });
 
-app.get('/ingredientsList', sessionValidation, async (req, res) => {
+app.get('/bookmarks_page/:title', sessionValidation, async (req, res) => {
+  if (req.session.authenticated) {
+    try {
+      const userEmail = req.session.email;
+      const bookmarkTitle = req.params.title;
+      const user = await userCollection.findOne({ email: userEmail });
+
+      if (user) {
+        const bookmark = user.bookmarks.find(bookmark => bookmark.title === bookmarkTitle);
+        if (bookmark) {
+          res.render('bookmarks_page', { bookmark });
+        } else {
+          res.status(404).send('Bookmark not found');
+        }
+      } else {
+        res.status(404).send('User not found');
+      }
+    } catch (error) {
+      console.log(error);
+      res.status(500).send('Internal server error');
+    }
+  } else {
+    res.status(401).send('Unauthorized');
+  }
+});
+
+
+
+
+
+app.get('/shoppingList', sessionValidation, async (req, res) => {
     if (req.session.authenticated) {
-        res.render("ingredientsList")
+        try {
+            const userEmail = req.session.email;
+            const user = await userCollection.findOne({ email: userEmail });
+      
+            if (user) {
+            //   console.log(user.shoppinglist);
+              res.render('shoppingList', { shoppinglist: user.shoppinglist });
+            } else {
+              res.status(404).send('User not found');
+            }
+          } catch (error) {
+            console.log(error);
+            res.status(500).send('Internal server error');
+          }
+
     } else {
         res.status(401).send('Unauthorized');
     }
+});
+
+app.get('/filter', async (req, res) => {
+    res.render("filter");
+});
+
+app.post('/filter', async (req, res) => {
+    const { servings, time, cuisine, spicy } = req.body;
+    const messages = [
+        { role: 'system', content: 'You are a helpful assistant that suggests name of foods based on given filters.' },
+        { role: 'user', content: `For week for lunch and dinner, Give me a list of some food that is ${cuisine} cuisine, ${spicy} spicy, for ${servings} servings, and within ${time} cooking time.` },
+    ];
+
+    try {
+        const completion = await openai.createChatCompletion({
+            model: 'gpt-3.5-turbo',
+            messages: messages,
+        });
+
+        const completionText = completion.data.choices[0].message.content;
+        const recipes = completionText.split('\n').filter(recipe => recipe.trim() !== '');
+        res.render('filteredRecommendation', { recipes: recipes });
+    } catch (error) {
+        console.log(error);
+        res.status(500).send('Error retrieving recipe recommendations.');
+    }
+});
+
+app.get('/filteredRecommendation', async (req, res) => {
+    res.render("filteredRecommendation");
 });
 
 app.use(express.static(__dirname + "/public"));

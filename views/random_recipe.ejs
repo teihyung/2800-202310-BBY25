@@ -1,0 +1,220 @@
+<%- include("templates/header") %>
+
+<!-- Add custom CSS for background image and text -->
+<style>
+  body {
+    background-image: url('/img/background.jpg');
+    background-size: cover;
+    background-position: center;
+  }
+
+  .content-wrapper {
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 20px;
+    border-radius: 15px;
+  }
+
+  h1 {
+    font-size: 2rem;
+    font-weight: 700;
+  }
+
+  h2 {
+    font-weight: 700;
+  }
+
+  ol li {
+    margin-bottom: 10px;
+  }
+
+
+  .instructions-list {
+    list-style-type: none;
+    padding: 0;
+  }
+
+  .list-group-item-custom {
+    background-color: rgba(255, 204, 0, 0.5);
+  }
+
+
+  .card-img-top {
+    width: 80%;
+    height: 80%;
+    /* padding-right: 1em; */
+    align-content: center;
+    border: solid rgba(255, 204, 0, 0.5) 
+  }
+/* Adjust image size for smaller screens */
+@media (max-width: 768px) {
+  .card-img-top {
+    width: 100%;
+    height: auto;
+  }
+}
+
+
+</style>
+
+
+<div id="loading-spinner" style="display: none;">
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+  <!-- Add your loading spinner markup here, e.g., an animated GIF or an SVG spinner -->
+</div>
+<!-- Add this inside the head tag or right before the closing body tag -->
+<!-- <script src="/path/to/spinner.js"></script> -->
+
+<div class="container mt-4">
+  <div class="content-wrapper">
+
+      <img src="/img/food/<%= recipeImage %>.jpg" class="card-img-top" alt="<%= recipeImage %>">
+      <div class="position-relative">
+      <h1 class="mb-4">
+        <%= recipeTitle %>
+        <% if (!isBookmarksPage) { %>
+          <div class="mt-auto align-self-end">
+            <a href="/bookmarked" class="bookmark-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-bookmark" viewBox="0 0 16 16">
+                <path fill="black" d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5V2zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1H4z"/>
+              </svg>
+            </a>
+          </div>
+        <% } %>
+      </h1>
+    </div>
+
+
+<div class="position-relative">
+  <h3>Ingredients</h3>
+    <input type="hidden" name="userId" value="<%= userId %>">
+    <input type="hidden" name="title" value="<%= recipeTitle %>">
+    <input type="hidden" name="ingredients" value="<%= recipeIngredients %>">
+    <div class="d-flex justify-content-end">
+    <button id="saveToListButton" class="btn btn-primary">Add to Shopping List</button></div><br>
+
+  <ul class="list-group instructions-list">
+      <% const ingredientsArray = recipeIngredients.split('\n'); %>
+      <% for (let ingredient of ingredientsArray) { %>
+        <% const words = ingredient.trim().split(' '); %>
+        <% if ((words.length >= 2 && !words[0].includes('ed') && !words[1].includes('ed'))) { %>
+          <li class="list-group-item list-group-item-custom"><%= ingredient %></li>
+        <% } %>
+      <% } %>
+  </ul><br>
+</div>
+
+  <h3>Instructions</h3>
+<ol class="list-group instructions-list">
+  <% recipeInstructions.forEach(function(instruction, index) { %>
+    <li class="list-group-item list-group-item-custom"><%= index + 1 %>. <%= instruction %></li>
+  <% }); %>
+</ol><br><br>
+  </div>
+</div>
+
+<script>
+
+
+    document.getElementById('saveToListButton').addEventListener('click', function(event) {
+    event.preventDefault(); // Prevent the default form submission behavior
+
+    const title = document.querySelector('input[name="title"]').value;
+    const ingredients = document.querySelector('input[name="ingredients"]').value;
+
+    const confirmation = confirm("Are you sure you want to add this list?");
+    if (confirmation) {
+      fetch('/shoppingList/add', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ title, ingredients }),
+      })
+        .then(response => {
+          if (response.ok) {
+            console.log('List added successfully.');
+            const saveButton = document.getElementById('saveToListButton');
+            saveButton.textContent = 'Saved';
+            saveButton.disabled = true;
+          } else {
+            console.error('Error adding list.');
+            window.alert('List already exists.');
+          }
+        })
+        .catch(error => {
+          console.error('An error occurred:', error);
+          window.alert('An error occurred. Please try again.');
+        });
+    }
+  });
+
+  </script>
+
+
+  <script>
+
+
+  const bookmarkIcon = document.querySelector('.bookmark-icon');
+  const bookmarkIconSvg = bookmarkIcon.querySelector('svg');
+  const bookmarkIconSvgPath = bookmarkIconSvg.querySelector('path');
+  const isBookmarked = bookmarkIcon.classList.contains('bookmarked');
+  
+
+  bookmarkIcon.addEventListener('click', async function(event) {
+    event.preventDefault(); // Prevents the default behavior of the link
+
+    bookmarkIcon.classList.toggle('bookmarked');
+
+    // Check if the recipe is bookmarked after the icon is toggled
+    const isBookmarked = bookmarkIcon.classList.contains('bookmarked');
+
+    if (isBookmarked) {
+      bookmarkIconSvgPath.setAttribute('d',
+        'M2 2v13.5a.5.5 0 0 0 .74.439L8 13.069l5.26 2.87A.5.5 0 0 0 14 15.5V2a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z'
+      ); // Change the 'd' attribute to the new icon path
+    } else {
+      bookmarkIconSvgPath.setAttribute('d',
+        'M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5V2zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1H4z'
+      ); // Change the 'd' attribute back to the original icon path
+    }
+
+    // Send a request to the server to add or remove the bookmark
+    const response = await fetch(isBookmarked ? '/bookmarks/add' : '/bookmarks/remove', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        title: '<%= recipeTitle %>',
+        instructions: <%- JSON.stringify(recipeInstructions) %>,
+        url: '<%= originalUrl %>',
+        isBookmarked: true
+      }),
+    });
+
+    // Handle any errors
+    if (!response.ok) {
+      console.error('Failed to update bookmark status');
+    }
+  });
+
+// Update the bookmark icon appearance based on the initial bookmarked state
+if (isBookmarked) {
+  bookmarkIconSvgPath.setAttribute('d',
+    'M2 2v13.5a.5.5 0 0 0 .74.439L8 13.069l5.26 2.87A.5.5 0 0 0 14 15.5V2a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z'
+  );
+} else {
+  bookmarkIconSvgPath.setAttribute('d',
+    'M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5V2zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1H4z'
+  );
+}
+
+
+
+</script>
+
+
+<%- include("templates/footer") %>
+

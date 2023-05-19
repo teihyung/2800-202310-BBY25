@@ -1,0 +1,102 @@
+<%- include("templates/header") %>
+
+<!-- Add custom CSS for background image and text -->
+<style>
+  body {
+    background-image: url('/img/background.jpg');
+    background-size: cover;
+    background-position: center;
+  }
+
+  .content-wrapper {
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 20px;
+    border-radius: 15px;
+  }
+
+  h1 {
+    font-size: 2rem;
+    font-weight: 700;
+  }
+
+  h2 {
+    font-weight: 700;
+  }
+
+  ul {
+    list-style-type: none;
+    padding: 0;
+  }
+
+  .list-group-item-custom {
+    background-color: rgba(255, 204, 0, 0.5);
+  }
+</style>
+
+<div class="container mt-4">
+  <div class="content-wrapper">
+    <h2>Shopping List</h2>
+
+    <% if (shoppinglist.length > 0) { %>
+      <ul class="list-group instructions-list">
+        <% for (let item of shoppinglist) { %>
+          <div class="title" data-title="<%= item.title %>">
+            <br>
+            <h4>For '<%= item.title %>'</h4>
+            <button class="delete-button" onclick="deleteList('<%= item.title %>')"> - </button>
+          </div>
+          
+          <% if (item.ingredients) { %>
+            <% const ingredientsArray = item.ingredients.split('\n'); %>
+            <% for (let ingredient of ingredientsArray) { %>
+              <% const words = ingredient.trim().split(' '); %>
+              <% if (words.length !== 1 && !words[0].includes('ed') && !words[1].includes('ed')) { %>
+                <li class="list-group-item list-group-item-custom">
+                  <%= ingredient %>
+                </li>
+              <% } %>
+            <% } %>
+          <% } %>
+        <% } %>
+        <br><br>
+      </ul>
+    <% } else { %>
+      <p>No lists found.</p>
+    <% } %>
+  </div>
+</div>
+
+<%- include("templates/footer") %>
+
+
+
+<script>
+function deleteList(title) {
+  const confirmation = confirm("Are you sure you want to delete this list?");
+  if (confirmation) {
+    fetch('/shoppingList/delete', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ title }),
+    })
+    .then(response => {
+      if (response.ok) {
+        console.log('List deleted successfully.');
+        localStorage.setItem('listDeleted', 'true');
+    
+        // Remove the deleted list from the UI
+        location.reload();
+      } else {
+        console.error('Error deleting list.');
+      }
+    })
+    .catch(error => {
+      console.error(error);
+    });
+  }
+}
+
+
+</script> 

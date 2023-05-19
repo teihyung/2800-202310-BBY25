@@ -1,0 +1,52 @@
+<%- include("templates/header") %>
+
+<!-- Add custom CSS for background image and text -->
+<style>
+  body {
+    background-image: url('/img/background.jpg');
+    background-size: cover;
+    background-position: center;
+  }
+
+  .content-wrapper {
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 20px;
+    border-radius: 15px;
+  }
+
+  h1 {
+    font-size: 2rem;
+    font-weight: 700;
+  }
+
+  h2 {
+    font-weight: 700;
+  }
+
+  ul {
+    list-style-type: none;
+    padding: 0;
+  }
+
+  .list-group-item-custom {
+    background-color: rgba(255, 204, 0, 0.5);
+  }
+</style>
+
+<div class="container mt-4">
+  <div class="content-wrapper">
+    <h1 class="mb-4"><%= name %></h1>
+    <h2>Shopping List</h2>
+
+    <ul class="list-group instructions-list">
+      <% shoppingList.forEach(function(ingredient) { %>
+        <li class="list-group-item list-group-item-custom"><%= ingredient %></li>
+      <% }); %>
+    </ul><br>
+<div class="d-flex justify-content-end">
+    <a href="/shopping-list" type="submit" class="btn btn-primary">Save</a>
+  </div>
+  </div>
+</div>
+
+<%- include("templates/footer") %>

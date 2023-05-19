@@ -1,16 +1,38 @@
-<form action="/members" method="GET">
-  <div class="input-group">
-    <a href="/filter">
-    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-filter mx-2 my-1" viewBox="0 0 16 16">
-      <path d="M6 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z"/>
-    </svg>
-  </a>
-  <form action="/members" method="post">
-    <input type="text" name="ingredient" class="form-control" placeholder="Search...">
-    <button type="submit" class="btn btn-link p-0">
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-search mx-2 my-2" viewBox="0 0 16 16">
-        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
-      </svg>
-    </button>
+<div class="container mt-5">
+  <form action="/members" method="GET" id="search-form">
+      <div class="input-group position-relative">
+          <a href="/filter" class="input-group-text">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-filter" viewBox="0 0 16 16">
+                  <path d="M6 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z"/>
+              </svg>
+          </a>
+          <input type="text" name="ingredient" id="search-input" class="form-control" placeholder="Search..." aria-haspopup="true" data-bs-toggle="dropdown">
+          <ul class="dropdown-menu" id="search-history-list" aria-labelledby="search-input">
+              <% searchHistory.forEach(function(item) { %>
+                  <li><a class="dropdown-item" href="#"><%= item %></a></li>
+              <% }); %>
+          </ul>
+          <button type="submit" class="btn btn-link p-0 position-absolute top-50" style="right: 0; transform: translateY(-50%);">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                  <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+              </svg>
+          </button>
+      </div>
   </form>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz4fnFO9gybB5eD1zgl2wAFcKzG6AVoSfCkVz6Nf9CdoJd1Fb1y1f6e72p" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js" integrity="sha384-cn7l7gDp0eyniUwwAZgrzD06kc/tftFf19TOAs2zVinnD/C7E91j9yyk5//jjpt/" crossorigin="anonymous"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+      const searchHistoryListItems = document.querySelectorAll('#search-history-list li a');
+
+      searchHistoryListItems.forEach(item => {
+          item.addEventListener('click', (event) => {
+              event.preventDefault();
+              document.getElementById('search-input').value = event.target.textContent;
+              const dropdownInstance = bootstrap.Dropdown.getInstance(document.getElementById('search-input'));
+              dropdownInstance.hide();
+          });
+      });
+  });
+</script>
