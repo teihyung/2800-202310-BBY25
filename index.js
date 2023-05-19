@@ -456,10 +456,6 @@ function getRandomRecipes(data, count) {
               return;
           }
 
-
-
-
-
             // Retrieve the user's search history from the database
             const result = await userCollection.findOne({ email: req.session.email });
           
