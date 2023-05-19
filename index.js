@@ -438,8 +438,8 @@ function getRandomRecipes(data, count) {
 
   let randomRecipes;
 
-  app.get('/hat', (req, res) => {
-    res.render('hat');  // Render the "hat" view
+  app.get('/kitchenGenie', (req, res) => {
+    res.render('kitchenGenie');  // Render the "Genie" view
 });
 
   
@@ -450,9 +450,9 @@ function getRandomRecipes(data, count) {
             const ingredient = req.query.ingredient;
 
 
-            if (ingredient === "hat") {
+            if (ingredient === "kitchenGenie") {
               // Redirect to a different route
-              res.redirect('/hat');
+              res.redirect('/kitchenGenie');
               return;
           }
 
