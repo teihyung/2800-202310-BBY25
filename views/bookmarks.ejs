@@ -21,6 +21,20 @@
   ol li {
     margin-bottom: 10px;
   }
+
+  .delete-button {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 3px 6px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+  }
+
+  .delete-button:hover {
+    background-color: #c82333;
+  }
 </style>
 
 <div id="loading-spinner" style="display: none;">
@@ -37,14 +51,14 @@
     <% if (bookmarks.length > 0) { %>
       <% for (let bookmark of bookmarks) { %>
         <div class="content-wrapper">
-          <h3 class="mb-1">
+          <h4 class="mb-1">
             <b>
               <a class="bookmark-link" href="/bookmarks_page/<%= bookmark.title %>">
                 <%= bookmark.title %>
               </a>
               <button class="delete-button" onclick="deleteBookmark('<%= bookmark.title %>')">Delete</button>
             </b>
-          </h3>
+          </h4>
         </div>
       <% } %>
     <% } else { %>
@@ -69,7 +83,7 @@
       .then(response => {
         if (response.ok) {
           console.log('Bookmark deleted successfully.');
-          location.reload(); // Refresh the page to reflect the changes
+          location.reload(); 
         } else {
           console.error('Error deleting bookmark.');
         }
