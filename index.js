@@ -781,23 +781,21 @@ app.post('/shoppingList/add', sessionValidation, async(req, res) => {
   app.post('/bookmarks/remove', sessionValidation, async (req, res) => {
     if (req.session.authenticated) {
       try {
-        const { url } = req.body;        
+        const { title } = req.body; 
         const userEmail = req.session.email;
         
         const user = await userCollection.findOne({ email: userEmail });
-        const existingBookmarkIndex = user.bookmarks.findIndex(bookmark => bookmark.url === url);
+        const existingBookmarkIndex = user.bookmarks.findIndex(bookmark => bookmark.title === title); 
   
         if (existingBookmarkIndex !== -1) {
-          // Bookmark exists, remove it
           const result = await userCollection.updateOne(
             { email: userEmail },
-            { $pull: { bookmarks: { url } } }
+            { $pull: { bookmarks: { title } } } 
           );
           
           console.log(result);
           res.status(200).send('Bookmark removed successfully');
         } else {
-          // Bookmark does not exist
           res.status(400).send('Bookmark does not exist');
         }
       } catch (error) {
@@ -808,6 +806,7 @@ app.post('/shoppingList/add', sessionValidation, async(req, res) => {
       res.status(401).send('Unauthorized');
     }
   });
+  
 
 
 
