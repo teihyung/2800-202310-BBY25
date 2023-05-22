@@ -25,13 +25,58 @@
   p {
     font-size: 1.2rem;
   }
+
+  .list-group-item-custom {
+    background-color: rgba(255, 204, 0, 0.5);
+  }
 </style>
 
 <div class="container mt-4">
   <div class="content-wrapper">
-    <h2><%= bookmark.title %></h2>
-    <p><%= bookmark.instructions %></p>
-    <a href="<%= bookmark.url %>">Go to the original recipe</a>
+    <h1 class="mb-4"><%= bookmark.title %></h1>
+
+    <h2>Ingredients</h2>
+    <ul class="list-group instructions-list">
+      <% 
+        if (typeof bookmark.ingredients === 'string') {
+          const ingredientsLines = bookmark.ingredients.split(',');
+          ingredientsLines.forEach(function(line, index) {
+            const ingredientsArray = line.split(', ');
+            for (let ingredient of ingredientsArray) {
+              %>
+                <li class="list-group-item list-group-item-custom"><%= ingredient.trim() %></li>
+              <%
+            }
+          });
+        } else if (Array.isArray(bookmark.ingredients)) {
+          bookmark.ingredients.forEach(function(ingredient) {
+            %>
+              <li class="list-group-item list-group-item-custom"><%= ingredient.trim() %></li>
+            <%
+          });
+        }
+      %>
+    </ul>
+
+    <h2>Instructions</h2>
+    <ol class="list-group instructions-list">
+      <% 
+        if (typeof bookmark.instructions === 'string') {
+          const instructionsArray = bookmark.instructions.split('.,');
+          instructionsArray.forEach(function(instruction, index) {
+            %>
+              <li class="list-group-item list-group-item-custom"><%= instruction %></li>
+            <%
+          });
+        } else if (Array.isArray(bookmark.instructions)) {
+          bookmark.instructions.forEach(function(instruction, index) {
+            %>
+              <li class="list-group-item list-group-item-custom"><%= index + 1 %>. <%= instruction %></li>
+            <%
+          });
+        }
+      %>
+    </ol>
   </div>
 </div>
 

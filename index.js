@@ -751,7 +751,7 @@ app.post('/shoppingList/add', sessionValidation, async(req, res) => {
   app.post('/bookmarks/add', sessionValidation, async (req, res) => {
     if (req.session.authenticated) {
       try {
-        const { title, instructions, url, isBookmarked } = req.body;        
+        const { title, ingredients, instructions, url, isBookmarked } = req.body;        
         const userEmail = req.session.email;
         const user = await userCollection.findOne({ email: userEmail });
         const existingBookmarkIndex = user.bookmarks.findIndex(bookmark => bookmark.url === url);
@@ -760,7 +760,7 @@ app.post('/shoppingList/add', sessionValidation, async(req, res) => {
           // Bookmark does not exist, add it
           const result = await userCollection.updateOne(
             { email: userEmail },
-            { $push: { bookmarks: { title, instructions, url, isBookmarked } } }
+            { $push: { bookmarks: { title, ingredients, instructions, url, isBookmarked } } }
           );
           
           console.log(result);
