@@ -676,7 +676,6 @@ app.get('/recipe_ran/:title', (req, res) => {
       res.status(500).send('Error retrieving recipe instructions.');
     }
   });
-  
 
 // Save the ingredients from random recipes to shopping list page.  
 app.post('/shoppingList/add', sessionValidation, async(req, res) => {
