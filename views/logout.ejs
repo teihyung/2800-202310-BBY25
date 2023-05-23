@@ -1,5 +1,16 @@
 <%- include("templates/header") %> 
-    <p>You are logged out.</p>
+
+<style>
+      .content-wrapper {
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 20px;
+    border-radius: 15px;
+  }
+</style>
+
+<div class="content-wrapper">
+    <h3>You are logged out.</h3><br>
     <button type="button" class="btn btn-primary rounded-pill px-3" onclick="window.location.href='/login'">Login</button>
-<button type="button" class="btn btn-warning rounded-pill px-3" onclick="window.location.href='/'">Return to first page</button>
+<button type="button" class="btn btn-warning rounded-pill px-3" onclick="window.location.href='/'">Return to first page</button><br>
+</div>
 <%- include("templates/footer") %> 
