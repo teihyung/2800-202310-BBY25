@@ -46,48 +46,51 @@
 <%- include("templates/footer") %>
 
 <script>
-  function bookmarkRecipe(event, index, title, ingredients, instructions) {
-    event.preventDefault();
+function bookmarkRecipe(event, index, title, ingredients, instructions) {
+  event.preventDefault();
 
-    const bookmarkIcon = document.querySelector('#bookmark-icon-' + index);
-    const bookmarkIconSvgPath = bookmarkIcon.querySelector('path');
+  const bookmarkIcon = document.querySelector('#bookmark-icon-' + index);
+  const bookmarkIconSvgPath = bookmarkIcon.querySelector('path');
 
-    const requestData = {
-      title: title,
-      ingredients: ingredients,
-      instructions: instructions,
-    };
+  const isBookmarked = bookmarkIcon.classList.contains('bookmarked');
+  bookmarkIcon.classList.toggle('bookmarked'); 
 
-    fetch('/bookmarks/add', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(requestData),
-    })
-      .then(response => {
-        if (response.ok) {
-          console.log('Recipe bookmarked successfully.');
-          bookmarkIcon.classList.toggle('bookmarked'); 
-          
-          const isBookmarked = bookmarkIcon.classList.contains('bookmarked');
-          if (isBookmarked) {
-            bookmarkIconSvgPath.setAttribute('d',
-              'M2 2v13.5a.5.5 0 0 0 .74.439L8 13.069l5.26 2.87A.5.5 0 0 0 14 15.5V2a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z'
-            );
-          } else {
-            bookmarkIconSvgPath.setAttribute('d',
-              'M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5V2zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1H4z'
-            );
-          }
+  const requestData = {
+    title: title,
+    ingredients: ingredients,
+    instructions: instructions,
+    isBookmarked: !isBookmarked
+  };
+
+  fetch(isBookmarked ? '/bookmarks/remove' : '/bookmarks/add', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(requestData),
+  })
+    .then(response => {
+      if (response.ok) {
+        console.log('Recipe bookmarked successfully.');
+        
+        if (isBookmarked) {
+          bookmarkIconSvgPath.setAttribute('d',
+            'M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5V2zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1H4z'
+          );
         } else {
-          console.error('Error bookmarking recipe.');
-          window.alert('An error occurred. Please try again.');
+          bookmarkIconSvgPath.setAttribute('d',
+            'M2 2v13.5a.5.5 0 0 0 .74.439L8 13.069l5.26 2.87A.5.5 0 0 0 14 15.5V2a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z'
+          );
         }
-      })
-      .catch(error => {
-        console.error('An error occurred:', error);
+      } else {
+        console.error('Error bookmarking recipe.');
         window.alert('An error occurred. Please try again.');
-      });
-  }
+      }
+    })
+    .catch(error => {
+      console.error('An error occurred:', error);
+      window.alert('An error occurred. Please try again.');
+    });
+}
+
 </script>
