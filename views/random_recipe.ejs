@@ -1,12 +1,6 @@
 <%- include("templates/header") %>
 
-<!-- Add custom CSS for background image and text -->
 <style>
-  body {
-    background-image: url('/img/background.jpg');
-    background-size: cover;
-    background-position: center;
-  }
 
   .content-wrapper {
     background-color: rgba(255, 255, 255, 0.8);
@@ -191,8 +185,8 @@
       },
       body: JSON.stringify({
         title: '<%= recipeTitle %>',
-        ingredients: <%- JSON.stringify(recipeInstructions) %>,
-        instructions: <%- JSON.stringify(recipeInstructions) %>,
+        ingredients: '<%- JSON.stringify(recipeInstructions) %>',
+        instructions: '<%- JSON.stringify(recipeInstructions) %>',
         url: '<%= originalUrl %>',
         isBookmarked: true
       }),
