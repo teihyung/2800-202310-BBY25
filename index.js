@@ -211,17 +211,25 @@ app.post('/submitUser', async (req, res) => {
     var password = req.body.password;
     var status_user = req.body.status;
 
+    const user = await findUserByEmail(email);
+
+    if (user) {
+        res.render("createUser", { error: "Email already exists"});
+        return;
+    }
+
     const schema = Joi.object(
         {
             email: Joi.string().email().required(),
-            username: Joi.string().alphanum().max(20).required(),
+            username: Joi.string().regex(/^\w+(?: \w+)*$/).max(20).required(),
             password: Joi.string().max(20).required(),
         });
 
     const validationResult = schema.validate({email, username, password});
     if (validationResult.error != null) {
-        console.log(validationResult.error);
-        res.redirect("/createUser");
+        const error = validationResult.error.details[0].message;
+        console.log(error);
+        res.render("createUser", { error: error});
         return;
     }
 
@@ -279,7 +287,8 @@ app.post('/loggingin', async (req, res) => {
 
     if (result.length !== 1) {
         console.log("user not found");
-        res.redirect("/wrongPw");
+        const error = "Incorrect email or password";
+        res.render("login", { error: error});
         return;
     }
     if (await bcrypt.compare(password, result[0].password)) {
@@ -293,8 +302,8 @@ app.post('/loggingin', async (req, res) => {
         res.redirect('/members');
         return;
     } else {
-        console.log("incorrect password");
-        res.redirect('/wrongPw');
+        const error = "Incorrect email or password";
+        res.render("login", { error: error});
         return;
     }
 });
@@ -304,9 +313,6 @@ app.get('/logout', (req, res) => {
     res.render("logout");
 });
 
-app.get('/wrongPw', (req, res) => {
-    res.render("wrongPw");
-});
 
 app.use('/loggedin', sessionValidation);
 app.get('/loggedin', (req, res) => {
@@ -360,7 +366,7 @@ app.get('/reset-password', async (req, res) => {
 
     const user = await findUserByEmail(req.session.email);
 
-    if (!user || user.resetCodeExpiration < new Date()) {
+    if (!user && user.resetCodeExpiration < new Date()) {
         // Invalid or expired reset code
         const error = 'Invalid or expired reset code';
         console.log('Error:', error);
@@ -371,21 +377,25 @@ app.get('/reset-password', async (req, res) => {
 
 app.post('/reset-password', async (req, res) => {
     const { email, code } = req.body;
+    const user = await findUserByEmail(req.session.email);
     // console.log('Email:', email);
     // console.log('Code:', code);
+    const userCode = parseInt(code,10);
+    const dbCode = parseInt(user.resetCode,10);
 
     // Check if the user exists in the database
-    const user = await findUserByEmail(req.session.email);
-    user.resetCode = code;
+    console.log(userCode === dbCode);
+    console.log(code);
+    console.log(user.resetCode);
     console.log(user.resetCodeExpiration);
     console.log(new Date());
 
-    if (user && user.resetCode === code && user.resetCodeExpiration > new Date()) {
+    if (userCode === dbCode && user.resetCodeExpiration > new Date()) {
         // User exists and the entered code matches the saved reset code
         res.redirect('/change_password');
     } else {
         // Invalid code or user not found
-        const error = 'Invalid code';
+        const error = 'Invalid code or time expired';
         console.log('Error:', error);
         res.render('reset-password', { email, error });
     }
@@ -838,7 +848,7 @@ app.post('/change_password', async (req, res) => {
         // Redirect the user to the login page or any other appropriate page
         return res.render('login');
     } else {
-        // Passwords do not match
+
         const error = 'Passwords do not match';
         console.log('Error:', error);
         return res.render('change_password', { error });

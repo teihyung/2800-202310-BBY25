@@ -32,9 +32,12 @@
 
     select {
         padding: 6px;
-        font-size: 16px;
+        font-size: 14px;
         border: 1px solid #ccc;
-        width: 80%;
+        width: 65%;
+    }
+    option {
+        width: 70% /* Adjust the width of the option content */
     }
 
     .spicy {
@@ -88,7 +91,9 @@
             servingsSelect.value === ""
         ) {
             alert("Please select values for all fields.");
+            window.location.reload();
             return false; // Prevent form submission
+
         }
 
         return true; // Proceed with form submission
@@ -96,7 +101,7 @@
 </script>
 
 <div class="filter-container">
-    <form action="/filter" method="POST" onsubmit ="validateForm()">
+    <form action="/filter" method="POST" onsubmit="return validateForm()">
             <div class="row justify-content-center py-5">
                 <div class="dropdown-food">
                     <h3>Cuisine</h3>

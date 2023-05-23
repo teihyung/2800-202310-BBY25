@@ -2,12 +2,15 @@ require('dotenv').config();
 
 const nodeMailer = require('nodemailer');
 const {createTransport} = require("nodemailer");
+const findUserByEmail = require('./user').findUserByEmail;
 
 
 
 async function sendResetPasswordEmail(email, code) {
-
+    const user = await findUserByEmail(email);
+    const name = user.username;
     const html = `
+    <h1>Hello ${name}, you have requested reset password</h1>
     <h1>Reset Your Password</h1>
     <p>Please put your code in the website:</p>
     <h3>${code}</h3>

@@ -8,10 +8,11 @@
         background-color: #fff;
         border-radius: 5px;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        width: 900px;
+        width: 90%;
         max-width: 90%;
-        height: 500px;
+        height: 60vh; /* Adjust the percentage as per your requirements */
     }
+
 
     .form-floating {
         width: 100%;
@@ -68,6 +69,11 @@
                     <label for="floatingPassword">Password</label>
                 </div>
                 <br>
+
+                <% if (typeof error !== 'undefined' && error !== null) { %>
+                    <div class="alert alert-danger"><%= error %></div>
+                <% } %>
+
                 <div class="forgot-password">
                     <a href="/forgot-password">Forgot password?</a>
                 </div>
@@ -76,8 +82,9 @@
                     <a href="/createUser">Don't have an account?</a>
                 </div>
                 <br>
-                <button class="w-100 btn btn-lg btn-primary" type="submit">Sign in</button>
 
+
+                <button class="w-100 btn btn-lg btn-primary" type="submit">Sign in</button>
                 <p class="mt-5 mb-3 text-body-secondary">© 2017–2023</p>
             </form>
         </div>
