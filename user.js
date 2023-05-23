@@ -15,7 +15,7 @@ async function createUser(email, username, password) {
 }
 
 async function findUserByEmail(email) {
-    const result = await userCollection.find({email: email}).project({email: 1, password: 1, user_type: 1,resetCodeExpiration:1}).toArray();
+    const result = await userCollection.find({email: email}).project({email: 1, password: 1, user_type: 1,resetCodeExpiration:1, resetCode:1}).toArray();
     if (result.length == 1) {
         return result[0];
     }
