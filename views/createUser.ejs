@@ -65,9 +65,15 @@
                         <label for="floatingPassword">Password</label>
                     </div>
                     <br>
+
                     <div class="login-link">
                         <a href="/login">Already have an account? Login here</a><br><br>
                     </div>
+
+                    <% if (typeof error !== 'undefined' && error !== null) { %>
+                        <div class="alert alert-danger"><%= error %></div>
+                    <% } %>
+
                     <button class="w-100 btn btn-lg btn-primary">Submit</button>
                 </form>
             </div>

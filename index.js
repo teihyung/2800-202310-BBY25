@@ -214,14 +214,15 @@ app.post('/submitUser', async (req, res) => {
     const schema = Joi.object(
         {
             email: Joi.string().email().required(),
-            username: Joi.string().alphanum().max(20).required(),
+            username: Joi.string().regex(/^\w+(?: \w+)*$/).max(20).required(),
             password: Joi.string().max(20).required(),
         });
 
     const validationResult = schema.validate({email, username, password});
     if (validationResult.error != null) {
-        console.log(validationResult.error);
-        res.redirect("/createUser");
+        const error = validationResult.error.details[0].message;
+        console.log(error);
+        res.render("createUser", { error: error});
         return;
     }
 
@@ -279,7 +280,9 @@ app.post('/loggingin', async (req, res) => {
 
     if (result.length !== 1) {
         console.log("user not found");
-        res.redirect("/wrongPw");
+        // res.redirect("/wrongPw");
+        const error = "Incorrect email or password";
+        res.render("login", { error: error});
         return;
     }
     if (await bcrypt.compare(password, result[0].password)) {
