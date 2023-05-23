@@ -51,7 +51,7 @@
                 <form class="w-75 mx-auto" action="/submitUser" method="post">
                     <h1 class="h3 mb-3 fw-normal">Please sign up</h1>
                     <div class="form-floating">
-                        <input name="username" type="text" class="form-control" id="floatingInput"
+                        <input name="username" type="text" pattern="[A-Za-z0-9]+" class="form-control" id="floatingInput"
                                placeholder="username">
                         <label for="floatingInput">Username</label>
                     </div>
@@ -60,7 +60,7 @@
                         <label for="floatingInput">Email address</label>
                     </div>
                     <div class="form-floating">
-                        <input name='password' type="password" class="form-control" id="floatingPassword"
+                        <input name='password' pattern="[A-Za-z0-9!@#$%^&*()-_=+[\]{}|;:,.<>/?]+" minlength="4" type="password" class="form-control" id="floatingPassword"
                                placeholder="password">
                         <label for="floatingPassword">Password</label>
                     </div>

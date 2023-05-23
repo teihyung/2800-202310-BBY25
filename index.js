@@ -211,6 +211,13 @@ app.post('/submitUser', async (req, res) => {
     var password = req.body.password;
     var status_user = req.body.status;
 
+    const user = await findUserByEmail(email);
+
+    if (user) {
+        res.render("createUser", { error: "Email already exists"});
+        return;
+    }
+
     const schema = Joi.object(
         {
             email: Joi.string().email().required(),
