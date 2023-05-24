@@ -36,14 +36,12 @@
 </style>
 
 <!-- Add this inside your HTML body -->
-<div id="loading-spinner" style="display: none;">
-  <div class="spinner-border text-primary" role="status">
-    <span class="visually-hidden">Loading...</span>
-  <!-- Add your loading spinner markup here, e.g., an animated GIF or an SVG spinner -->
+<div id="loading-spinner" style="display: none; position: fixed; z-index: 999; height: 100%; width: 100%; top: 0; left: 0; background-color: rgba(255, 255, 255, 0.8);">
+  <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+    <img src="/img/spinner.gif" alt="Loading...">
+  </div>
 </div>
-</div>
-<!-- Add this inside the head tag or right before the closing body tag -->
-<script src="/path/to/spinner.js"></script>
+
 
 
 <% if (recipes.length > 0) { %>
@@ -61,5 +59,35 @@
     </div>
   </div>
 <% } %>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+  function showSpinner() {
+    document.getElementById('loading-spinner').style.display = 'block';
+  }
+
+  // Attach event listener to all anchor tags
+  document.querySelectorAll('a').forEach(function(link) {
+    link.addEventListener('click', function(event) {
+      showSpinner(); // Show the spinner
+    });
+  });
+
+  window.addEventListener('beforeunload', function() {
+    showSpinner(); // Show the spinner before leaving the page
+  });
+</script>
+
 
 <%- include("templates/footer") %>
