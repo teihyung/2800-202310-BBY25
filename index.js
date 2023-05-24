@@ -650,7 +650,8 @@ app.get('/recipe/:name', async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    res.status(500).send('Error retrieving recipe instructions.');
+    res.render('error', { error: error });
+
   }
 });
 
