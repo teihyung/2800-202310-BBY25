@@ -6,7 +6,7 @@
                     <path d="M6 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z"/>
                 </svg>
             </a>
-            <input type="text" name="ingredient" id="search-input" class="form-control" placeholder="Search..." aria-haspopup="true" data-bs-toggle="dropdown">
+            <input type="text" name="ingredient" id="search-input" class="form-control" placeholder="Search one or more ingredients..." aria-haspopup="true" data-bs-toggle="dropdown">
             <ul class="dropdown-menu" id="search-history-list" aria-labelledby="search-input">
                 <% searchHistory.forEach(function(item) { %>
                     <li><a class="dropdown-item" href="#"><%= item %></a></li>
