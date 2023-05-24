@@ -10,10 +10,13 @@ async function sendResetPasswordEmail(email, code) {
     const user = await findUserByEmail(email);
     const name = user.username;
     const html = `
-    <h1>Hello ${name}, you have requested reset password</h1>
-    <h1>Reset Your Password</h1>
-    <p>Please put your code in the website:</p>
-    <h3>${code}</h3>
+    <div style="background-color: #f4f4f4; padding: 10px;">
+        <img src="/img/favicon.png" alt="KitchenGenie Logo" class="logo" />
+        <h1 style="color: #333;">Hello ${name}, you have requested a password reset</h1>
+        <h2 style="color: #333;">Reset Your Password</h2>
+        <p style="color: #333;">Please enter the following code on the website:</p>
+        <h3>${code}</h3>
+    </div>
 `;
 
     const transporter = nodeMailer.createTransport({
@@ -27,7 +30,7 @@ async function sendResetPasswordEmail(email, code) {
     });
 
     const info = await transporter.sendMail({
-        from: `"Kitchen Genie" <kitchengenievancouver@gmail.com>`,
+        from: `"KitchenGenie" <kitchengenievancouver@gmail.com>`,
         to: email,
         subject: `Reset Your Password`,
         html: html,

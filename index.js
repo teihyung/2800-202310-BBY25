@@ -221,7 +221,7 @@ app.post('/submitUser', async (req, res) => {
     const schema = Joi.object(
         {
             email: Joi.string().email().required(),
-            username: Joi.string().regex(/^\w+(?: \w+)*$/).max(20).required(),
+            username: Joi.string().regex(/^[\w!@#$%^&*()\-=_+[\]{}|\\;:'",.<>/?]+(?: [\w!@#$%^&*()\-=_+[\]{}|\\;:'",.<>/?]+)*$/).max(20).required(),
             password: Joi.string().max(20).required(),
         });
 
@@ -964,7 +964,7 @@ app.post('/filter', async (req, res) => {
     const { servings, time, cuisine, spicy } = req.body;
     const messages = [
         { role: 'system', content: 'You are a helpful assistant that suggests name of foods based on given filters.' },
-        { role: 'user', content: `For week for lunch and dinner, Give me a list of some food that is ${cuisine} cuisine, ${spicy} spicy, for ${servings} servings, and within ${time} cooking time.` },
+        { role: 'user', content: `For week for lunch and dinner, Give me a list of some food that is ${cuisine} cuisine, ${spicy} spicy, for ${servings} servings, and within ${time} cooking time. Only the names please` },
     ];
 
     try {
