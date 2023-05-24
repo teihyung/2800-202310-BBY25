@@ -185,8 +185,8 @@
       },
       body: JSON.stringify({
         title: '<%= recipeTitle %>',
-        ingredients: '<%- JSON.stringify(recipeInstructions) %>',
-        instructions: '<%- JSON.stringify(recipeInstructions) %>',
+        ingredients: <%- JSON.stringify(recipeIngredients) %>,
+        instructions: <%- JSON.stringify(recipeInstructions) %>,
         url: '<%= originalUrl %>',
         isBookmarked: true
       }),
