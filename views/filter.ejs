@@ -10,9 +10,9 @@
         border-radius: 5px;
 
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        width: 80%;
-        max-width: 90%;
-        height: 75%;
+        width: 75%;
+        max-width: 80%;
+        height: 65%;
     }
 
     .form-floating {
@@ -27,12 +27,12 @@
         border-radius: 10px;
         padding: 10px;
         width: 80%;
-        margin-bottom: 10px;
+        margin-bottom: 5px;
     }
 
     select {
         padding: 6px;
-        font-size: 14px;
+        font-size: 10px;
         border: 1px solid #ccc;
         width: 65%;
     }
@@ -41,8 +41,8 @@
     }
 
     .spicy {
-        margin-top: 10px;
-        margin-bottom: 10px;
+        margin-top: 5px;
+        margin-bottom: 5px;
         display: inline-block;
         position: relative;
         text-align: center;
@@ -60,18 +60,18 @@
         border-radius: 10px;
         padding: 10px;
         width: 80%;
-        margin-top: 10px;
-        margin-bottom: 10px;
+        margin-top: 5px;
+        margin-bottom: 5px;
     }
 
     .serving {
         margin-top: 10px;
-        margin-bottom: 10px;
+        margin-bottom: 5px;
         display: inline-block;
         position: relative;
         text-align: center;
         border: 1px solid #ccc;
-        border-radius: 10px;
+        border-radius: 5px;
         padding: 10px;
         width: 80%;
     }
@@ -104,7 +104,7 @@
     <form action="/filter" method="POST" onsubmit="return validateForm()">
             <div class="row justify-content-center py-5">
                 <div class="dropdown-food">
-                    <h3>Cuisine</h3>
+                    <h4>Cuisine</h4>
                     <label for="cuisine-select"></label>
                     <select id="cuisine-select" name="cuisine" onchange="selectCuisine()">
                         <option value="" disabled selected>Select</option>
@@ -119,7 +119,7 @@
                     </select>
                 </div>
                 <div class="spicy">
-                    <h3>Do you like spicy food?</h3>
+                    <h4>Do you like spicy food?</h4>
                     <label for="spicy-select"></label>
                     <select id="spicy-select" name="spicy" onchange="spicyLevel()">
                         <option value="" disabled selected>Select</option>
@@ -129,7 +129,7 @@
                 </div>
 
                 <div class="cooking-time">
-                    <h3>Cooking time?</h3>
+                    <h4>Cooking time?</h4>
                     <label for="time-select"></label>
                     <select id="time-select" name="time" onchange="selectTime()">
                         <option value="" disabled selected>Select</option>
@@ -144,7 +144,7 @@
                 </div>
 
                 <div class="serving">
-                    <h3>For how many people?</h3>
+                    <h4>For how many people?</h4>
                     <label for="servings-select"></label>
                     <select id="servings-select" name="servings">
                         <option value="" disabled selected>Select</option>
