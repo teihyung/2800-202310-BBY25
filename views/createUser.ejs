@@ -5,7 +5,7 @@
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        background-color: #fff;
+        background-color: rgba(255, 255, 255, 0.8);
         border-radius: 5px;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         width: 900px;
@@ -60,14 +60,20 @@
                         <label for="floatingInput">Email address</label>
                     </div>
                     <div class="form-floating">
-                        <input name='password' type="password" class="form-control" id="floatingPassword"
+                        <input name='password' pattern="[A-Za-z0-9!@#$%^&*()-_=+[\]{}|;:,.<>/?]+" minlength="4" type="password" class="form-control" id="floatingPassword"
                                placeholder="password">
                         <label for="floatingPassword">Password</label>
                     </div>
                     <br>
+
                     <div class="login-link">
                         <a href="/login">Already have an account? Login here</a><br><br>
                     </div>
+
+                    <% if (typeof error !== 'undefined' && error !== null) { %>
+                        <div class="alert alert-danger"><%= error %></div>
+                    <% } %>
+
                     <button class="w-100 btn btn-lg btn-primary">Submit</button>
                 </form>
             </div>

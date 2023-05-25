@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html>
+<%- include("templates/header") %>
 <head>
     <title>Error</title>
     <!-- Add your CSS styles here -->
@@ -9,4 +8,32 @@
     <p><%= error %></p>
     <a href="/members">Back to search</a>
 </body>
-</html>
+
+<style>
+    body {
+        font-family: 'Roboto', sans-serif;
+        background-image: url('/img/background.jpg');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    h1, p {
+        margin-top: 30px;
+    }
+    
+    h1 {
+        font-size: 24px;
+        font-weight: bold;
+    }
+    
+    p {
+        font-size: 18px;
+    }
+    
+    a {
+        font-size: 16px;
+        text-decoration: none;
+    }
+</style>
+
+<%- include("templates/footer") %> 

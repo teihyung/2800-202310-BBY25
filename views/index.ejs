@@ -1,55 +1,86 @@
 <%- include("templates/header") %>
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 
-<!-- Add custom CSS for background image and text -->
-<style>
-  body {
-    font-family: 'Roboto', sans-serif;
-    background-image: url('/img/background.jpg');
-    background-size: cover;
-    background-position: center;
-  }
-
-  </style>
 <div class="container py-4">
   <%- include("templates/searchBar", { searchHistory: searchHistory }) %>
  
   <div class="recommend py-5 justify-content-center">
-    <div
-      class="d-inline-flex justify-content-center px-4 py-2 fs-3 rounded-pill bg-light"
-      style="--bs-bg-opacity: .9"
-    >
+    <div class="d-inline-flex justify-content-center px-4 py-2 fs-3 rounded-pill bg-light" style="--bs-bg-opacity: .9">
       Hi <%= userData.username %>, try these today!
     </div>
   </div>
-
+  
   <div class="container">
     <div class="row">
-      <% randomRecipes.forEach(function(recipe) { %>
+      <% randomRecipes.forEach(function(recipe, index) { %>
         <div class="col-md-4 mb-3">
           <div class="card">
             <img src="/img/food/<%= recipe.Image_Name %>.jpg" class="card-img-top" alt="<%= recipe.Image_Name %>">
             <div class="card-body d-flex flex-column">
-              <h5 class="card-title"><a href="/recipe_ran/<%= recipe.Title %>"><%= recipe.Title %></a></h5>
-               <div class="mt-auto align-self-end">
-              <a href="/bookmarked" class="bookmark-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-bookmark" viewBox="0 0 16 16">
-                  <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5V2zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1H4z"/>
-                </svg>
-              </a>
-              </div><br>
-              <!-- <button class="w-100 btn btn-m btn-primary" type="submit" action="">Learn more</button> -->
+              <h5 class="card-title"><a href="/recipe_ran/<%- encodeURIComponent(recipe.Title) %>"><%= recipe.Title %></a></h5>
+              <div class="mt-auto align-self-end">
+                <a href="#" class="bookmark-icon" onclick="bookmarkRecipe(event, '<%= index %>', '<%= recipe.Title %>', <%= JSON.stringify(recipe.Ingredients) %>, <%= JSON.stringify(recipe.Instructions) %>)">
+                  <svg id="bookmark-icon-<%= index %>" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-bookmark" viewBox="0 0 16 16">
+                    <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5V2zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1H4z"/>
+                  </svg>
+                </a>
+              </div>
             </div>
           </div>
         </div>
       <% }); %>
     </div>
   </div>
-
-  </div>
-  <br />
 </div>
-
-
+<br>
 
 <%- include("templates/footer") %>
+
+<script>
+function bookmarkRecipe(event, index, title, ingredients, instructions) {
+  event.preventDefault();
+
+  const bookmarkIcon = document.querySelector('#bookmark-icon-' + index);
+  const bookmarkIconSvgPath = bookmarkIcon.querySelector('path');
+
+  const isBookmarked = bookmarkIcon.classList.contains('bookmarked');
+  bookmarkIcon.classList.toggle('bookmarked'); 
+
+  const requestData = {
+    title: title,
+    ingredients: ingredients,
+    instructions: instructions,
+    isBookmarked: !isBookmarked
+  };
+
+  fetch(isBookmarked ? '/bookmarks/remove' : '/bookmarks/add', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(requestData),
+  })
+    .then(response => {
+      if (response.ok) {
+        console.log('Recipe bookmarked successfully.');
+        
+        if (isBookmarked) {
+          bookmarkIconSvgPath.setAttribute('d',
+            'M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5V2zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1H4z'
+          );
+        } else {
+          bookmarkIconSvgPath.setAttribute('d',
+            'M2 2v13.5a.5.5 0 0 0 .74.439L8 13.069l5.26 2.87A.5.5 0 0 0 14 15.5V2a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z'
+          );
+        }
+      } else {
+        console.error('Error bookmarking recipe.');
+        window.alert('An error occurred. Please try again.');
+      }
+    })
+    .catch(error => {
+      console.error('An error occurred:', error);
+      window.alert('An error occurred. Please try again.');
+    });
+}
+
+</script>
