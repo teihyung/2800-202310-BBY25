@@ -8,72 +8,33 @@
         transform: translate(-50%, -50%);
         background-color: rgba(255, 255, 255, 0.8);
         border-radius: 5px;
-
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         width: 75%;
         max-width: 80%;
-        height: 65%;
+        height: 70%; /* Adjusted height */
+
+        /* Add the following to ensure the container is not covered by the footer */
+        z-index: 9999;
     }
 
-    .form-floating {
-        width: 100%;
-    }
 
-    .dropdown-food {
-        display: inline-block;
-        position: relative;
-        text-align: center;
-        border: 1px solid #ccc;
-        border-radius: 10px;
-        padding: 10px;
-        width: 80%;
-        margin-bottom: 5px;
+    .dropdown-food,
+    .spicy,
+    .cooking-time,
+    .serving {
+        flex: 1 0 auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 5px;
     }
 
     select {
         padding: 6px;
         font-size: 10px;
         border: 1px solid #ccc;
-        width: 65%;
-    }
-    option {
-        width: 70% /* Adjust the width of the option content */
-    }
-
-    .spicy {
-        margin-top: 5px;
-        margin-bottom: 5px;
-        display: inline-block;
-        position: relative;
-        text-align: center;
-        border: 1px solid #ccc;
-        border-radius: 10px;
-        padding: 10px;
-        width: 80%;
-    }
-
-    .cooking-time {
-        display: inline-block;
-        position: relative;
-        text-align: center;
-        border: 1px solid #ccc;
-        border-radius: 10px;
-        padding: 10px;
         width: 80%;
         margin-top: 5px;
-        margin-bottom: 5px;
-    }
-
-    .serving {
-        margin-top: 10px;
-        margin-bottom: 5px;
-        display: inline-block;
-        position: relative;
-        text-align: center;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        padding: 10px;
-        width: 80%;
     }
 </style>
 
@@ -156,8 +117,8 @@
                 </div>
             </div>
             <div class="col-md-12 text-center">
-                <button class="w-30 btn btn-lg btn-primary" type="submit">Submit</button>
-                <button class="w-30 btn btn-lg btn-info" type="button" onclick="window.location.href='/members'">Return home</button>
+                <button class="w-30 btn btn-lg btn-primary rounded-pill px-3" type="submit">Submit</button>
+                <button class="w-30 btn btn-lg btn-info rounded-pill px-3" type="button" onclick="window.location.href='/members'">Return home</button>
             </div>
     </form>
 </div>
