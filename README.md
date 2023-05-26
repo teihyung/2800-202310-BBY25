@@ -157,7 +157,7 @@ During our development process, we've taken inspiration and learned from many on
 
 
 ## 8. License
-KitchenGenie 
+©KitchenGenie 2022-2023
 
 ## 9. References 
 - Node.js: Official website and documentation - https://nodejs.org
@@ -190,8 +190,9 @@ In summary, AI played a significant role in code generation, troubleshooting, an
 ## 11. Contact Information
 - Bingdididi (zhoubingdica@gmail.com)
 - YejuJ (jungyj320@gmail.com)
-- teihyung(teihyung@gmail.com)
-- 
+- 7374179 ( 7374179@gmail.com)
+- teihyung (teihyung@gmail.com)
+
 
     
     
