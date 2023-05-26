@@ -14,7 +14,7 @@ Our team, BBY25, is developing a web application that utilizes AI technology to 
 
 ## 2. Names of Contributors
 
-*Bingdi Zhou -Hi there! I'm Bingdi, a Term 2 CST student at BCIT. My fascination with programming languages started with Java, leading me to establish a strong foundation in coding. For the KitchenGenie app, I implemented the AI Search Bar feature and exciting Easter eggs. But I'm not always immersed in code; I love the great outdoors and enjoy playing piano. I constantly seek new challenges and opportunities for growth in both worlds.
+* Bingdi Zhou -Hi there! I'm Bingdi, a Term 2 CST student at BCIT. My fascination with programming languages started with Java, leading me to establish a strong foundation in coding. For the KitchenGenie app, I implemented the AI Search Bar feature and exciting Easter eggs. But I'm not always immersed in code; I love the great outdoors and enjoy playing piano. I constantly seek new challenges and opportunities for growth in both worlds.
 
 * Yeju Jung - Hello, I'm Yeju, a first-year CST student at BCIT with a focus on JavaScript and front-end development. I am passionate about       learning new programming languages, with python currently on top of my list. For the KitchenGenie project, I've successfully implemented the Random Recipe and Shopping List features. When I'm not buried in code, I find serenity in nature, particularly birdwatching and capturing the beauty of wildlife through my photography.
 
