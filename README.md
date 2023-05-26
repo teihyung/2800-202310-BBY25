@@ -129,12 +129,29 @@ subfolders and files:
     search.ejs			# display the result from the search bar and filter
     shopping-list.ejs		# shopping list save
     shoppingList.ejs		# display shopping list
-## 6. Credits
-* [MealDB API](https://www.themealdb.com/api.php)
-* [GhatGPT API](https://developers.google.com/gmail/api)](https://platform.openai.com/docs/introduction)
-* [Bootstrap](https://getbootstrap.com/)
-* [Font Awesome](https://fontawesome.com/)
-* [Google Fonts](https://fonts.google.com/)
+```
+
+## 7. Credits
+
+We want to extend our gratitude to the following services that played a significant part in the completion of this project:
+
+* [MealDB API](https://www.themealdb.com/api.php) for providing access to their extensive recipe database.
+* [OpenAI's GPT-3](https://openai.com/research/gpt-3/) for making the ChatGPT API available and empowering us to create a more dynamic and interactive user experience.
+* [Bootstrap](https://getbootstrap.com/) for their incredible UI framework that helped us create a clean and responsive design.
+* [Font Awesome](https://fontawesome.com/) for their vast collection of icons.
+* [Google Fonts](https://fonts.google.com/) for enhancing our application's aesthetics with their wide variety of fonts.
+
+## 8. References
+
+During our development process, we've taken inspiration and learned from many online resources. We would like to highlight the following:
+
+* [Mozilla Developer Network (MDN)](https://developer.mozilla.org/) - For providing comprehensive documentation on web technologies.
+* [Stack Overflow](https://stackoverflow.com/) - For being an invaluable community-driven resource for all our programming queries.
+* [W3Schools](https://www.w3schools.com/) - For their straightforward and easy-to-follow tutorials on a variety of web development topics.
+
+## 9. License
+
+KitchenGenie is released under the MIT License. Please refer to the [LICENSE](https://opensource.org/licenses/MIT) file that accompanies this project for more information including complete terms and conditions.
 
 
     
