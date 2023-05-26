@@ -4,7 +4,7 @@
 
 # KitchenGenie
 
-<img src="/img/KitchenGenie.jpg" alt="Kitchen Genie Logo" style="border-radius: 50%;" width="200" height="100">
+<img src="/img/KitchenGenie.jpg" alt="Kitchen Genie Logo" style="border-radius: 50%;" width="250" height="100">
 
 </div>
 
