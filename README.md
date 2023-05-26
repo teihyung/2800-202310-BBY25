@@ -190,7 +190,7 @@ In summary, AI played a significant role in code generation, troubleshooting, an
 ## 11. Contact Information
 - Bingdididi (zhoubingdica@gmail.com)
 - YejuJ (jungyj320@gmail.com)
-- 7374179 ( 7374179@gmail.com)
+- 7374179 (7374179@gmail.com)
 - teihyung (teihyung@gmail.com)
 
 
