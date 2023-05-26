@@ -1,5 +1,8 @@
+<!-- Include header template -->
 <%- include("templates/header") %>
+
 <style>
+    /* Style for form container */
     .create-form-container {
         position: fixed;
         top: 50%;
@@ -13,10 +16,12 @@
         height: 500px;
     }
 
+    /* Style for form-floating class */
     .form-floating {
-        width: 100%; /* Adjust the width as needed */
+        width: 100%;
     }
 
+    /* Styles for login link */
     .login-link a:active {
         position: relative;
         transition: background-color 1s;
@@ -34,6 +39,7 @@
         animation: coverText 1s forwards;
     }
 
+    /* Keyframes for the animation */
     @keyframes coverText {
         50% {
             opacity: 0;
@@ -44,42 +50,51 @@
     }
 </style>
 
+<!-- Form Container -->
 <div class="create-form-container">
     <main class="form-signin m-auto">
         <div class="row justify-content-center py-5">
             <div class="col-md-6">
+                <!-- Sign Up Form -->
                 <form class="w-75 mx-auto" action="/submitUser" method="post">
                     <h1 class="h3 mb-3 fw-normal">Please sign up</h1>
+
+                    <!-- Username Input -->
                     <div class="form-floating">
-                        <input name="username" type="text" class="form-control" id="floatingInput"
-                               placeholder="username">
-                        <label for="floatingInput">Username</label>
+                        <input name="username" type="text" class="form-control" id="usernameInput" placeholder="username" required>
+                        <label for="usernameInput">Username</label>
                     </div>
+
+                    <!-- Email Input -->
                     <div class="form-floating">
-                        <input name="email" type="email" class="form-control" id="floatingInput" placeholder="email">
-                        <label for="floatingInput">Email address</label>
+                        <input name="email" type="email" class="form-control" id="emailInput" placeholder="email" required>
+                        <label for="emailInput">Email address</label>
                     </div>
+
+                    <!-- Password Input -->
                     <div class="form-floating">
-                        <input name='password' pattern="[A-Za-z0-9!@#$%^&*()-_=+[\]{}|;:,.<>/?]+" minlength="4" type="password" class="form-control" id="floatingPassword"
-                               placeholder="password">
-                        <label for="floatingPassword">Password</label>
+                        <input name='password' pattern="[A-Za-z0-9!@#$%^&*()-_=+[\]{}|;:,.<>/?]+" minlength="4" type="password" class="form-control" id="passwordInput" placeholder="password" required>
+                        <label for="passwordInput">Password</label>
                     </div>
                     <br>
 
+                    <!-- Login Link -->
                     <div class="login-link">
                         <a href="/login">Already have an account? Login here</a><br><br>
                     </div>
 
+                    <!-- Error Handling -->
                     <% if (typeof error !== 'undefined' && error !== null) { %>
                         <div class="alert alert-danger"><%= error %></div>
                     <% } %>
 
-                    <button class="w-100 btn btn-lg btn-primary">Submit</button>
+                    <!-- Submit Button -->
+                    <button class="w-100 btn btn-lg btn-primary" type="submit">Submit</button>
                 </form>
             </div>
         </div>
     </main>
 </div>
 
-
+<!-- Include footer template -->
 <%- include("templates/footer") %> 

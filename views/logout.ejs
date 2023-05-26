@@ -1,16 +1,25 @@
-<%- include("templates/header") %> 
+<!-- Include header template -->
+<%- include("templates/header") %>
 
+<!-- CSS Styling -->
 <style>
-      .content-wrapper {
-    background-color: rgba(255, 255, 255, 0.8);
-    padding: 20px;
-    border-radius: 15px;
-  }
+    /* Styles for the content wrapper */
+    .content-wrapper {
+        background-color: rgba(255, 255, 255, 0.8);
+        padding: 20px;
+        border-radius: 15px;
+    }
 </style>
 
+<!-- Content Section -->
 <div class="content-wrapper">
-    <h3>You are logged out.</h3><br>
+    <h3>You are logged out.</h3>
+    <br>
+    <!-- Buttons for login and returning to the first page -->
     <button type="button" class="btn btn-primary rounded-pill px-3" onclick="window.location.href='/login'">Login</button>
-<button type="button" class="btn btn-warning rounded-pill px-3" onclick="window.location.href='/'">Return to first page</button><br>
+    <button type="button" class="btn btn-warning rounded-pill px-3" onclick="window.location.href='/'">Return to first page</button>
+    <br>
 </div>
-<%- include("templates/footer") %> 
+
+<!-- Include footer template -->
+<%- include("templates/footer") %>
