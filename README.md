@@ -20,7 +20,7 @@ Our team, BBY25, is developing a web application that utilizes AI technology to 
 
 * Taehyuk Chung -Hey, I'm Taehyuk! As a Term 2 CST student at BCIT, I am deeply engrossed in the world of technology. For our KitchenGenie project, I have contributed by implementing the Bookmark and User Profile features. I'm also passionate about photography, often using drones to capture breathtaking aerial shots. Outside of coding and photography, you'll find me cycling or strumming my guitar.
 
-* Tae Hyung Chung -Greetings, I'm Tae Hyung! Currently, I'm immersed in my Term 2 CST studies at BCIT, constantly expanding my tech knowledge. I brought the Log In, Log Out, and Filter features to life in our KitchenGenie app. Like my peers, I balance my love for technology with outdoor pursuits. My interests include drone photography, capturing stunning shots from above, and tennis.
+* Tae Hyung Lee -Greetings, I'm Tae Hyung! Currently, I'm immersed in my Term 2 CST studies at BCIT, constantly expanding my tech knowledge. I brought the Log In, Log Out, and Filter features to life in our KitchenGenie app. Like my peers, I balance my love for technology with outdoor pursuits. My interests include drone photography, capturing stunning shots from above, and tennis.
 	
 ## 3. Technologies and Resources Used
 
