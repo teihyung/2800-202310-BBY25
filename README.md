@@ -39,7 +39,7 @@ For API's we have used:
 * ChatGPT API
 * Kaggle database
 
-## 4. Complete setup/installion/usage
+## 4. Complete setup/installion/usage/.env
 Our application boasts a user-friendly and intuitive design, ensuring a seamless experience for our users. To get started: 
 
 * Navigate to http://gkqlocmzys.eu09.qoddiapp.com/
@@ -48,6 +48,32 @@ Our application boasts a user-friendly and intuitive design, ensuring a seamless
 * Voila! You will be presented with a wide variety of recipes.
 * Click on the name of a recipe to view the full ingredients and instructions.
 * Don't forget to "favorite" any recipes you like to save them to your bookmark page or save your ingredients needed in your shopping list.
+* Library installation
+* In order to run our code in local machine, you have to download the following,
+* ``` npm i Bcrypt```
+* ``` npm i Connect-mongo ```
+* ``` npm i Ejs ```
+* ``` npm i Express ```
+* ``` npm i Express-session ```
+* ``` npm i Joi ```
+* ``` npm i Nodemailer ```
+* ``` npm i Openai ```
+* ``` npm i Csv-parser ```
+* ``` npm i Node/Nodemon ```
+* Lastly, in order to run our code, you need to set up .env file inside that contains the following
+* ``` OPENAI_API_KEY ```
+* ``` MONGODB_HOST ```
+* ``` MONGODB_USER```
+* ``` MONGODB_PASSWORD ```
+* ``` MONGODB_DATABASE ```
+* ``` MONGODB_SESSION_SECRET ```
+* ``` NODE_SESSION_SECRET ```
+* ``` EMAILJS_USER ``` 
+* ``` EMAILJS_HOST ```
+* ``` NODEMAILER_PW```
+
+## 5. file of content
+
 
 
 
