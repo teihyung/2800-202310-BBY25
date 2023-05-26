@@ -1,13 +1,16 @@
+<!-- Include header template -->
 <%- include("templates/header") %>
 
+<!-- CSS Styling -->
 <style>
-
+  /* Styles for content wrapper */
   .content-wrapper {
     background-color: rgba(255, 255, 255, 0.8);
     padding: 20px;
     border-radius: 15px;
   }
 
+  /* Styles for heading elements */
   h1 {
     font-size: 2rem;
     font-weight: 700;
@@ -17,52 +20,47 @@
     font-weight: 700;
   }
 
+  /* Styles for instructions list */
   ol li {
     margin-bottom: 10px;
   }
 
-
+  /* Styles for instructions list */
   .instructions-list {
     list-style-type: none;
     padding: 0;
   }
 
+  /* Styles for custom list group item */
   .list-group-item-custom {
     background-color: rgba(255, 204, 0, 0.5);
   }
 
-
+  /* Styles for card image */
   .card-img-top {
     width: 80%;
     height: 80%;
-    /* padding-right: 1em; */
-    align-content: center;
-    border: solid rgba(255, 204, 0, 0.5) 
   }
-/* Adjust image size for smaller screens */
-@media (max-width: 768px) {
-  .card-img-top {
-    width: 100%;
-    height: auto;
+
+  /* Adjust image size for smaller screens */
+  @media (max-width: 768px) {
+    .card-img-top {
+      width: 100%;
+      height: auto;
+    }
   }
-}
-
-
 </style>
 
-
+<!-- Loading spinner -->
 <div id="loading-spinner" style="display: none;">
   <div class="spinner-border text-primary" role="status">
     <span class="visually-hidden">Loading...</span>
   </div>
-  <!-- Add your loading spinner markup here, e.g., an animated GIF or an SVG spinner -->
 </div>
-<!-- Add this inside the head tag or right before the closing body tag -->
-<!-- <script src="/path/to/spinner.js"></script> -->
 
 <div class="container mt-4">
   <div class="content-wrapper">
-
+      <!-- Recipe Image and Title Section -->
       <img src="/img/food/<%= recipeImage %>.jpg" class="card-img-top" alt="<%= recipeImage %>">
       <div class="position-relative">
       <h1 class="mb-4">
@@ -79,7 +77,7 @@
       </h1>
     </div>
 
-
+<!-- Ingredients Section -->
 <div class="position-relative">
   <h3>Ingredients</h3>
     <input type="hidden" name="userId" value="<%= userId %>">
@@ -99,6 +97,7 @@
   </ul><br>
 </div>
 
+  <!-- Instructions Section -->
   <h3>Instructions</h3>
 <ol class="list-group instructions-list">
   <% recipeInstructions.forEach(function(instruction, index) { %>
@@ -112,8 +111,7 @@
 <br>
 
 <script>
-
-
+  // Save to Shopping List Button
     document.getElementById('saveToListButton').addEventListener('click', function(event) {
     event.preventDefault(); // Prevent the default form submission behavior
 
@@ -147,18 +145,12 @@
     }
   });
 
-  </script>
-
-
-  <script>
-
-
+  // Bookmark Icon
   const bookmarkIcon = document.querySelector('.bookmark-icon');
   const bookmarkIconSvg = bookmarkIcon.querySelector('svg');
   const bookmarkIconSvgPath = bookmarkIconSvg.querySelector('path');
   const isBookmarked = bookmarkIcon.classList.contains('bookmarked');
   
-
   bookmarkIcon.addEventListener('click', async function(event) {
     event.preventDefault(); // Prevents the default behavior of the link
 
@@ -208,11 +200,8 @@ if (isBookmarked) {
     'M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5V2zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1H4z'
   );
 }
-
-
-
 </script>
 
-
+<!-- Include footer template -->
 <%- include("templates/footer") %>
 

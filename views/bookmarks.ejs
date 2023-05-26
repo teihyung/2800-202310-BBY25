@@ -1,7 +1,9 @@
+<!-- Including header template -->
 <%- include("templates/header") %>
 
+<!-- Styling Section -->
 <style>
-
+  /* Styles for the content wrapper, h2, list items, and delete button */
   .content-wrapper {
     background-color: rgba(255, 255, 255, 0.8);
     padding: 10px;
@@ -32,21 +34,28 @@
   }
 </style>
 
+<!-- Loading spinner -->
 <div id="loading-spinner" style="display: none;">
   <div class="spinner-border text-primary" role="status">
     <span class="visually-hidden">Loading...</span>
   </div>
 </div>
+
+<!-- Importing spinner JS -->
 <script src="/path/to/spinner.js"></script>
 
+<!-- Main content -->
 <div class="container mt-4">
-  <div class="content-wrapper">  
+  <div class="content-wrapper">
+    <!-- Displaying bookmark list heading -->  
     <h2>Bookmarks List</h2>
 
+    <!-- Loop over each bookmark, if there are any -->
     <% if (bookmarks.length > 0) { %>
-      <% for (let bookmark of bookmarks) { %>
+      <% bookmarks.forEach(bookmark => { %>
         <div class="content-wrapper">
           <h4 class="mb-1">
+            <!-- Displaying bookmark link and delete button -->
             <b>
               <a class="bookmark-link" href="/bookmarks_page/<%= bookmark.title %>">
                 <%= bookmark.title %>
@@ -55,15 +64,18 @@
             </b>
           </h4>
         </div>
-      <% } %>
+      <% }) %>
+    <!-- If there are no bookmarks, display a message -->
     <% } else { %>
       <p>No bookmarks found.</p>
     <% } %>  
   </div>
 </div>
 
+<!-- Including footer template -->
 <%- include("templates/footer") %>
 
+<!-- JS function to delete a bookmark -->
 <script>
   function deleteBookmark(title) {
     const confirmation = confirm("Are you sure you want to delete this bookmark?");

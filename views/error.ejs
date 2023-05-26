@@ -1,15 +1,28 @@
+<!-- Include header template -->
 <%- include("templates/header") %>
+
+<!-- Head Section -->
 <head>
+    <!-- Page title -->
     <title>Error</title>
     <!-- Add your CSS styles here -->
 </head>
+
+<!-- Body Section -->
 <body>
+    <!-- Error heading -->
     <h1>Oops! Something went wrong.</h1>
+    
+    <!-- Error message -->
     <p><%= error %></p>
+    
+    <!-- Back to search link -->
     <a href="/members">Back to search</a>
 </body>
 
+<!-- Styling Section -->
 <style>
+    /* Style for body element */
     body {
         font-family: 'Roboto', sans-serif;
         background-image: url('/img/background.jpg');
@@ -17,23 +30,28 @@
         background-position: center;
     }
     
+    /* Style for heading and paragraph tags */
     h1, p {
         margin-top: 30px;
     }
     
+    /* Style for h1 heading */
     h1 {
         font-size: 24px;
         font-weight: bold;
     }
     
+    /* Style for paragraph */
     p {
         font-size: 18px;
     }
     
+    /* Style for anchor tag */
     a {
         font-size: 16px;
         text-decoration: none;
     }
 </style>
 
+<!-- Include footer template -->
 <%- include("templates/footer") %> 

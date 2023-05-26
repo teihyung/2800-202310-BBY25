@@ -1,7 +1,9 @@
+<!-- Include header template -->
 <%- include("templates/header") %>
 
+<!-- Styling Section -->
 <style>
-
+    /* Styles for content wrapper */
   .content-wrapper {
     background-color: rgba(255, 255, 255, 0.8);
     padding: 20px;
@@ -31,75 +33,79 @@
   }
 
   .title-container {
-  display: flex;
-  align-items: center; 
-  gap: 10px; 
-}
-
-.bookmark-icon {
-    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
 
+  .bookmark-icon {
+    margin-bottom: 20px;
+  }
 </style>
-
 </div>
+
 <script src="/path/to/spinner.js"></script>
 <div class="container mt-4">
   <div class="content-wrapper">
     <div class="title-container">
-    <h1 class="mb-4"><%= name %></h1>
-    <a href="/bookmarked" class="bookmark-icon">
-      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-bookmark" viewBox="0 0 16 16">
-        <path fill="currentColor" d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5V2zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1H4z"/>
-      </svg>
-    </a>
-  </div>
+      <h1 class="mb-4"><%= name %></h1>
+      <a href="/bookmarked" class="bookmark-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-bookmark"
+          viewBox="0 0 16 16">
+          <path fill="currentColor"
+            d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5V2zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1H4z" />
+        </svg>
+      </a>
+    </div>
 
-
-    <h2>Ingredients <button class="btn btn-primary save-to-shopping-list" data-recipe-name="<%= name %>">Save to Shopping List</button>
+    <h2>Ingredients <button class="btn btn-primary save-to-shopping-list" data-recipe-name="<%= name %>">Save to
+        Shopping List</button>
 
     </h2>
     <ul class="list-group shopping-list">
       <% shoppingList.forEach(function(item) { %>
-        <li class="list-group-item list-group-item-custom"><%= item %></li>
+      <li class="list-group-item list-group-item-custom"><%= item %></li>
       <% }); %>
-
     </ul>
-     
-    
 
-
-  <h2 class="mt-4">Instructions</h2>
+    <h2 class="mt-4">Instructions</h2>
     <ul class="list-group instructions-list">
       <% instructions.forEach(function(step) { %>
-        <li class="list-group-item list-group-item-custom"><%= step %></li>
+      <li class="list-group-item list-group-item-custom"><%= step %></li>
       <% }); %>
     </ul>
   </div>
-  <br>
-  <br>
-  <br>
+  <br><br><br>
 </div>
 
-
 <script>
+  // Select the bookmark icon elements
   const bookmarkIcon = document.querySelector('.bookmark-icon');
   const bookmarkIconSvg = bookmarkIcon.querySelector('svg');
   const bookmarkIconSvgPath = bookmarkIconSvg.querySelector('path');
+
+  // Check if the recipe is already bookmarked
   const isBookmarked = bookmarkIcon.classList.contains('bookmarked');
 
+  // Add event listener to bookmark icon
   bookmarkIcon.addEventListener('click', async function (event) {
-    event.preventDefault(); 
+    event.preventDefault();
     bookmarkIcon.classList.toggle('bookmarked');
 
     const isBookmarked = bookmarkIcon.classList.contains('bookmarked');
 
+    // Toggle the bookmark icon path
     if (isBookmarked) {
-      bookmarkIconSvgPath.setAttribute('d', 'M2 2v13.5a.5.5 0 0 0 .74.439L8 13.069l5.26 2.87A.5.5 0 0 0 14 15.5V2a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z'); // Change the 'd' attribute to the new icon path
+      bookmarkIconSvgPath.setAttribute('d',
+        'M2 2v13.5a.5.5 0 0 0 .74.439L8 13.069l5.26 2.87A.5.5 0 0 0 14 15.5V2a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z'
+        ); // Change the 'd' attribute to the new icon path
     } else {
-      bookmarkIconSvgPath.setAttribute('d', 'M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5V2zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1H4z'); // Change the 'd' attribute back to the original icon path
+      bookmarkIconSvgPath.setAttribute('d',
+        'M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5V2zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1H4z'
+        ); // Change the 'd' attribute back to the original icon path
     }
 
+    // Update the bookmark status on the server
     const response = await fetch(isBookmarked ? '/bookmarks/add' : '/bookmarks/remove', {
       method: 'POST',
       headers: {
@@ -120,92 +126,94 @@
   });
 
   if (isBookmarked) {
-    bookmarkIconSvgPath.setAttribute('d', 'M2 2v13.5a.5.5 0 0 0 .74.439L8 13.069l5.26 2.87A.5.5 0 0 0 14 15.5V2a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z');
+    bookmarkIconSvgPath.setAttribute('d',
+      'M2 2v13.5a.5.5 0 0 0 .74.439L8 13.069l5.26 2.87A.5.5 0 0 0 14 15.5V2a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z');
   } else {
-    bookmarkIconSvgPath.setAttribute('d', 'M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5V2zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1H4z');
+    bookmarkIconSvgPath.setAttribute('d',
+      'M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5V2zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1H4z'
+      );
   }
 
- 
-
+  /**
+   * Check if a recipe is saved in the local storage
+   * @param {string} recipeName - The name of the recipe
+   * @returns {boolean} - True if the recipe is saved, false otherwise
+   */
   function checkIfSaved(recipeName) {
-  const savedRecipes = JSON.parse(localStorage.getItem('savedRecipes')) || [];
-  return savedRecipes.includes(recipeName);
-}
+    const savedRecipes = JSON.parse(localStorage.getItem('savedRecipes')) || [];
+    return savedRecipes.includes(recipeName);
+  }
 
-function deleteSavedRecipe(recipeName) {
-  const savedRecipes = JSON.parse(localStorage.getItem('savedRecipes')) || [];
-  const updatedRecipes = savedRecipes.filter((savedRecipe) => savedRecipe !== recipeName);
-  localStorage.setItem('savedRecipes', JSON.stringify(updatedRecipes));
-}
+  /**
+   * Delete a saved recipe from the local storage
+   * @param {string} recipeName - The name of the recipe to delete
+   */
+  function deleteSavedRecipe(recipeName) {
+    const savedRecipes = JSON.parse(localStorage.getItem('savedRecipes')) || [];
+    const updatedRecipes = savedRecipes.filter((savedRecipe) => savedRecipe !== recipeName);
+    localStorage.setItem('savedRecipes', JSON.stringify(updatedRecipes));
+  }
 
-const saveToShoppingListButton = document.querySelector('.save-to-shopping-list');
-const recipeName = saveToShoppingListButton.dataset.recipeName;
-const isSaved = checkIfSaved(recipeName);
+  // Check if the recipe is already saved
+  const saveToShoppingListButton = document.querySelector('.save-to-shopping-list');
+  const recipeName = saveToShoppingListButton.dataset.recipeName;
+  const isSaved = checkIfSaved(recipeName);
 
-if (isSaved) {
-  saveToShoppingListButton.innerHTML = 'Saved';
-  saveToShoppingListButton.disabled = true;
-  saveToShoppingListButton.classList.add('btn-success');
-  saveToShoppingListButton.classList.remove('btn-primary');
-}
+  if (isSaved) {
+    // If saved, update button state
+    saveToShoppingListButton.innerHTML = 'Saved';
+    saveToShoppingListButton.disabled = true;
+    saveToShoppingListButton.classList.add('btn-success');
+    saveToShoppingListButton.classList.remove('btn-primary');
+  }
 
-saveToShoppingListButton.addEventListener('click', async () => {
-  try {
-    const shoppingListElements = document.querySelectorAll('.shopping-list li');
-    const shoppingList = Array.from(shoppingListElements).map(el => el.textContent);
+  saveToShoppingListButton.addEventListener('click', async () => {
+    try {
+      const shoppingListElements = document.querySelectorAll('.shopping-list li');
+      const shoppingList = Array.from(shoppingListElements).map(el => el.textContent);
 
-    const response = await fetch('/shoppingList/add', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        title: recipeName,
-        ingredients: JSON.stringify(shoppingList),
-      }),
-    });
+      const response = await fetch('/shoppingList/add', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: recipeName,
+          ingredients: JSON.stringify(shoppingList),
+        }),
+      });
 
-    if (response.ok) {
-      alert('Ingredients saved to shopping list!');
-      saveToShoppingListButton.innerHTML = 'Saved';
-      saveToShoppingListButton.disabled = true;
-      saveToShoppingListButton.classList.add('btn-success');
-      saveToShoppingListButton.classList.remove('btn-primary');
+      if (response.ok) {
+        alert('Ingredients saved to shopping list!');
+        saveToShoppingListButton.innerHTML = 'Saved';
+        saveToShoppingListButton.disabled = true;
+        saveToShoppingListButton.classList.add('btn-success');
+        saveToShoppingListButton.classList.remove('btn-primary');
 
-      const savedRecipes = JSON.parse(localStorage.getItem('savedRecipes')) || [];
-      savedRecipes.push(recipeName);
-      localStorage.setItem('savedRecipes', JSON.stringify(savedRecipes));
-    } else {
-      alert('Failed to save ingredients to shopping list.');
+        const savedRecipes = JSON.parse(localStorage.getItem('savedRecipes')) || [];
+        savedRecipes.push(recipeName);
+        localStorage.setItem('savedRecipes', JSON.stringify(savedRecipes));
+      } else {
+        alert('Failed to save ingredients to shopping list.');
+      }
+    } catch (error) {
+      console.error('Error:', error);
     }
-  } catch (error) {
-    console.error('Error:', error);
-  }
-});
+  });
 
-
-
-// Check if the list was deleted and update the button
-window.addEventListener('load', () => {
-  const listDeleted = localStorage.getItem('listDeleted');
-  if (listDeleted === 'true') {
-    saveToShoppingListButton.innerHTML = 'Save to Shopping List';
-    saveToShoppingListButton.disabled = false;
-    saveToShoppingListButton.classList.add('btn-primary');
-    saveToShoppingListButton.classList.remove('btn-success');
-    // Remove the flag from local storage
-    localStorage.removeItem('listDeleted');
-  }
-});
-
-
-
-
-
-
-
+  // Check if the list was deleted and update the button
+  window.addEventListener('load', () => {
+    const listDeleted = localStorage.getItem('listDeleted');
+    if (listDeleted === 'true') {
+      saveToShoppingListButton.innerHTML = 'Save to Shopping List';
+      saveToShoppingListButton.disabled = false;
+      saveToShoppingListButton.classList.add('btn-primary');
+      saveToShoppingListButton.classList.remove('btn-success');
+      // Remove the flag from local storage
+      localStorage.removeItem('listDeleted');
+    }
+  });
 </script>
 
-
+<!-- Include footer template -->
 <%- include("templates/footer") %>
-
