@@ -50,7 +50,7 @@ Our application boasts a user-friendly and intuitive design, ensuring a seamless
 * Don't forget to "favorite" any recipes you like to save them to your bookmark page or save your ingredients needed in your shopping list.
 * Library installation
 * In order to run our code in local machine, you have to download the following,
-* ``` npm i Bcrypt```
+* ```npm i Bcrypt```
 * ``` npm i Connect-mongo ```
 * ``` npm i Ejs ```
 * ``` npm i Express ```
@@ -70,7 +70,7 @@ Our application boasts a user-friendly and intuitive design, ensuring a seamless
 * ``` NODE_SESSION_SECRET ```
 * ``` EMAILJS_USER ``` 
 * ``` EMAILJS_HOST ```
-* ``` NODEMAILER_PW```
+* ```NODEMAILER_PW```
 
 ## 5. file of content
 Content of the project folder:
@@ -131,27 +131,67 @@ subfolders and files:
     shoppingList.ejs		# display shopping list
 ```
 
-## 7. Credits
+## 6. Credits
 
 We want to extend our gratitude to the following services that played a significant part in the completion of this project:
 
-* [MealDB API](https://www.themealdb.com/api.php) for providing access to their extensive recipe database.
-* [OpenAI's GPT-3](https://openai.com/research/gpt-3/) for making the ChatGPT API available and empowering us to create a more dynamic and interactive user experience.
-* [Bootstrap](https://getbootstrap.com/) for their incredible UI framework that helped us create a clean and responsive design.
-* [Font Awesome](https://fontawesome.com/) for their vast collection of icons.
-* [Google Fonts](https://fonts.google.com/) for enhancing our application's aesthetics with their wide variety of fonts.
+-  [MealDB API](https://www.themealdb.com/api.php) for providing access to their extensive recipe database.
+-  [OpenAI's GPT-3](https://openai.com/research/gpt-3/) for making the ChatGPT API available and empowering us to create a more dynamic and interactive user experience.
+-  [Bootstrap](https://getbootstrap.com/) for their incredible UI framework that helped us create a clean and responsive design.
+-  [Font Awesome](https://fontawesome.com/) for their vast collection of icons.
+- [Google Fonts](https://fonts.google.com/) for enhancing our application's aesthetics with their wide variety of fonts.
 
-## 8. References
+## 7. References
 
 During our development process, we've taken inspiration and learned from many online resources. We would like to highlight the following:
 
-* [Mozilla Developer Network (MDN)](https://developer.mozilla.org/) - For providing comprehensive documentation on web technologies.
-* [Stack Overflow](https://stackoverflow.com/) - For being an invaluable community-driven resource for all our programming queries.
-* [W3Schools](https://www.w3schools.com/) - For their straightforward and easy-to-follow tutorials on a variety of web development topics.
+-  [Mozilla Developer Network (MDN)](https://developer.mozilla.org/) - For providing comprehensive documentation on web technologies.
+-  [Stack Overflow](https://stackoverflow.com/) - For being an invaluable community-driven resource for all our programming queries.
+-  [W3Schools](https://www.w3schools.com/) - For their straightforward and easy-to-follow tutorials on a variety of web development topics.
+-  [Node.js](https://nodejs.org) - For their official website and comprehensive documentation which greatly assisted our understanding of Node.js.
+-  [OpenAI (ChatGPT)](https://www.openai.com) - For providing detailed documentation and resources that aided our implementation of the ChatGPT API.
+-  [Bootstrap](https://getbootstrap.com) - For their official website and extensive documentation, which guided our utilization of this responsive front-end framework.
+-  [MongoDB](https://www.mongodb.com) - For their official website and detailed documentation, enabling our effective use of this NoSQL database.
+-  [GitHub](https://github.com) - For being a reliable and user-friendly platform for version control and collaborative software development.
+-  [Studio3T](https://studio3t.com) - For their official website and resources that assisted our management of MongoDB databases.
 
-## 9. License
 
-KitchenGenie is released under the MIT License. Please refer to the [LICENSE](https://opensource.org/licenses/MIT) file that accompanies this project for more information including complete terms and conditions.
+## 8. License
+©KitchenGenie 2022-2023
+
+## 9. References 
+- Node.js: Official website and documentation - https://nodejs.org
+
+- ChatGPT by OpenAI: OpenAI website and documentation - https://www.openai.com
+
+- Bootstrap: Official website and documentation - https://getbootstrap.com
+
+- MongoDB: Official website and documentation - https://www.mongodb.com
+
+- GitHub: Official website and documentation - https://github.com
+
+- Studio3T: Official website and documentation - https://studio3t.com 
+
+- Spoonacular API - https://spoonacular.com/food-api/docs
+
+
+## 10. Big help from AI
+
+AI was utilized during the development of our app in several ways:
+
+- Code Generation: We employed AI-based code generation techniques to automate the process of writing code snippets. This involved training machine learning models on a large dataset of code examples, which allowed us to generate code snippets based on specific requirements or patterns.
+
+- Troubleshooting and Debugging: AI was employed to assist in troubleshooting and debugging issues within the application. By leveraging machine learning algorithms, we developed an intelligent system that could analyze error logs, stack traces, and runtime behavior to identify potential issues and suggest possible solutions.
+
+- Reference: We also utilized AI as a reference tool, leveraging its capabilities to gather ideas and insights. By harnessing natural language processing (NLP) techniques, we could analyze vast amounts of code, documentation, and online resources to extract relevant information and generate suggestions that inspired our development process.
+
+In summary, AI played a significant role in code generation, troubleshooting, and served as a valuable reference tool during the app development process. These AI-powered capabilities not only enhanced productivity but also facilitated faster development cycles and improved the overall quality of the application.
+
+## 11. Contact Information
+- Bingdididi (zhoubingdica@gmail.com)
+- YejuJ (jungyj320@gmail.com)
+- 7374179 (7374179@gmail.com)
+- teihyung (teihyung@gmail.com)
 
 
     
