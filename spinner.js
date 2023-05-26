@@ -1,4 +1,4 @@
-// main.js
+// code that shows and hides the spinner
 document.addEventListener('DOMContentLoaded', function () {
     const recipeLinks = document.querySelectorAll('.recipe-link');
   

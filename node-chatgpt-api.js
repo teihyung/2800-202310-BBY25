@@ -1,3 +1,6 @@
+
+// this is a simple chatbot that uses the OpenAI API to generate responses
+// as an example of how to use the API in javascript
 const { Configuration, OpenAIApi } = require("openai");
 const readlineSync = require("readline-sync");
 require("dotenv").config();

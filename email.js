@@ -1,11 +1,14 @@
+// require dotenv
 require('dotenv').config();
 
+// import nodeMailer and function to find user by email
 const nodeMailer = require('nodemailer');
 const {createTransport} = require("nodemailer");
 const findUserByEmail = require('./user').findUserByEmail;
 
 
 
+// function to send email to user with password reset code
 async function sendResetPasswordEmail(email, code) {
     const user = await findUserByEmail(email);
     const name = user.username;
@@ -42,7 +45,7 @@ async function sendResetPasswordEmail(email, code) {
 `;
 
 
-
+    // create transporter object using nodemailer
     const transporter = nodeMailer.createTransport({
         host: 'smtp.gmail.com',
         port: 465,
@@ -53,6 +56,7 @@ async function sendResetPasswordEmail(email, code) {
         }
     });
 
+    // info of email sender and receiver
     const info = await transporter.sendMail({
         from: `"KitchenGenie" <kitchengenievancouver@gmail.com>`,
         to: email,
@@ -62,5 +66,6 @@ async function sendResetPasswordEmail(email, code) {
 
     console.log("Message sent: %s", info.messageId);
 }
+
 
 module.exports = sendResetPasswordEmail;
