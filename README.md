@@ -73,10 +73,65 @@ Our application boasts a user-friendly and intuitive design, ensuring a seamless
 * ``` NODEMAILER_PW```
 
 ## 5. file of content
+Content of the project folder:
 
+```
+ Top level of project folder:               
+├── .gitignore                  # Files to ignore when pushing
+├── Procifile		        # require to run the web application on qoddi
+├── README.md			# README			
+├── databaseConnection.js	# connect to database
+├── dataset.csv			
+├── email.js			# send email
+├── index.js	
+├── node-chatgpt-api.js		# prototype for chatgpt api implementation on js
+├── package.json
+├── spinner.js
+├── style.css
+├── user.js			# find user on database
+└── utils.js			# directory 
 
+subfolders and files:
+├── img
+    ├── food			# inside the folder, there is estimate of 13,500 images. 
+    Genie.gif			# easter egg gif
+    background.jpg		
+    chef-hat.png		# easter egg hat
+    favicon.png			# logo
+    logo_hat.png		# easter egg 
+    spinner.gif			
+    
+├── view
+    ├── templates
+    	footer.ejs		
+	header.ejs	
+	searchBar.ejs		# searchbar 
+	svg.ejs			# menu bar 
+	user.ejs 		# make name visible in the members page
+    404.ejs
+    bookmarks.ejs		# bookmark display
+    bookmarks_page.ejs		# see list of book mark user put
+    change_password.ejs		# change password	
+    createUser.ejs		# create user
+    error.ejs			# error handling page
+    filter.ejs			# filter function
+    filteredRecommendation.ejs  # main page recommendation
+    forgot-password.ejs		# send reset code to email
+    index.ejs			# main page
+    kitchenGenie.ejs		# Easter egg
+    login.ejs			# login	
+    logout.ejs			# logout
+    main.ejs			# first page when user goes in to the link
+    profile.ejs			# view profile
+    random_recipe.ejs		# random recipe
+    recipe.ejs			
+    reset-password.ejs		# insert reset password code
+    search.ejs			# display the result from the search bar and filter
+    shopping-list.ejs		# shopping list save
+    shoppingList.ejs		# display shopping list
+```
+    
+    
+    
 
-
-
-	
 
