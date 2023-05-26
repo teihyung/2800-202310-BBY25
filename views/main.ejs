@@ -1,33 +1,25 @@
+<!-- Include header template -->
 <%- include("templates/header") %>
 
+<!-- CSS Styling -->
 <style>
-      .content-wrapper {
-    background-color: rgba(255, 255, 255, 0.8);
-    padding: 20px;
-    border-radius: 15px;
-  }
+    /* Styles for the content wrapper */
+    .content-wrapper {
+        background-color: rgba(255, 255, 255, 0.8);
+        padding: 20px;
+        border-radius: 15px;
+    }
 </style>
 
-<div class="content-wrapper text-center">
+<!-- Content Section -->
+<div class="content-wrapper">
+    <h3>You are logged out.</h3>
     <br>
-    <h1>Welcome to KitchenGenie</h1>
-    <p class="lead">The best way to manage your recipes</p>
-    <p class="lead">Please login or create an account to get started</p>
-    <button
-            type="button"
-            class="btn btn-primary rounded-pill px-3"
-            onclick="window.location.href='/login'"
-    >
-        Login
-    </button>
-    <button
-            type="button"
-            class="btn btn-danger rounded-pill px-3"
-            onclick="window.location.href='/createUser'"
-    >
-        Sign up
-    </button>
+    <!-- Buttons for login and returning to the first page -->
+    <button type="button" class="btn btn-primary rounded-pill px-3" onclick="window.location.href='/login'">Login</button>
+    <button type="button" class="btn btn-warning rounded-pill px-3" onclick="window.location.href='/'">Return to first page</button>
+    <br>
 </div>
 
-
+<!-- Include footer template -->
 <%- include("templates/footer") %>

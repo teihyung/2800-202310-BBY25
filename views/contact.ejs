@@ -1,10 +1,25 @@
-<%- include("templates/header") %> 
-    email address:
-    <form action='/submitEmail' method='post'>
-        <input name='email' type='text' placeholder='email'>
-        <button>Submit</button>
-    </form>
-    <% if (missing) { %>
-        <br> email is required
-    <% } %>  
-<%- include("templates/footer") %> 
+<!-- Include header template -->
+<%- include("templates/header") %>
+
+<!-- Form to submit email address -->
+<form action='/submitEmail' method='post'>
+    <!-- Label for the input field -->
+    <label for="email">Email address:</label>
+
+    <!-- Input field to enter the email -->
+    <input id="email" name='email' type='email' placeholder='Enter email' required>
+
+    <!-- Submit button for the form -->
+    <button type="submit">Submit</button>
+</form>
+
+<!-- Check if the email field is missing -->
+<% if (missing) { %>
+    <!-- If missing, display an error message -->
+    <div class="alert alert-danger" role="alert">
+        Email is required
+    </div>
+<% } %>
+
+<!-- Include footer template -->
+<%- include("templates/footer") %>

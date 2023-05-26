@@ -1,6 +1,9 @@
+<!-- Include header template -->
 <%- include("templates/header") %>
 
+<!-- Styling Section -->
 <style>
+    /* Container for the filter form */
     .filter-container {
         position: fixed;
         top: 50%;
@@ -11,13 +14,11 @@
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         width: 75%;
         max-width: 80%;
-        height: 70%; /* Adjusted height */
-
-        /* Add the following to ensure the container is not covered by the footer */
+        height: 70%;
         z-index: 9999;
     }
 
-
+    /* Styling for each dropdown section */
     .dropdown-food,
     .spicy,
     .cooking-time,
@@ -29,6 +30,7 @@
         margin: 5px;
     }
 
+    /* Styling for select dropdowns */
     select {
         padding: 6px;
         font-size: 10px;
@@ -38,7 +40,9 @@
     }
 </style>
 
+<!-- JavaScript Section -->
 <script>
+    /* Form validation function */
     function validateForm() {
         const cuisineSelect = document.getElementById('cuisine-select');
         const spicySelect = document.getElementById('spicy-select');
@@ -54,72 +58,76 @@
             alert("Please select values for all fields.");
             window.location.reload();
             return false; // Prevent form submission
-
         }
 
         return true; // Proceed with form submission
     }
 </script>
 
+<!-- Body Section -->
 <div class="filter-container">
     <form action="/filter" method="POST" onsubmit="return validateForm()">
-            <div class="row justify-content-center py-5">
-                <div class="dropdown-food">
-                    <h4>Cuisine</h4>
-                    <label for="cuisine-select"></label>
-                    <select id="cuisine-select" name="cuisine" onchange="selectCuisine()">
-                        <option value="" disabled selected>Select</option>
-                        <option value="italian">Italian</option>
-                        <option value="mexican">Mexican</option>
-                        <option value="indian">Indian</option>
-                        <option value="chinese">Chinese</option>
-                        <option value="korean">Korean</option>
-                        <option value="japanese">Japanese</option>
-                        <option value="mediterranean">Mediterranean</option>
-                        <option value="random">Any</option>
-                    </select>
-                </div>
-                <div class="spicy">
-                    <h4>Do you like spicy food?</h4>
-                    <label for="spicy-select"></label>
-                    <select id="spicy-select" name="spicy" onchange="spicyLevel()">
-                        <option value="" disabled selected>Select</option>
-                        <option value="Spicy-Yes">Yes</option>
-                        <option value="Spicy-No">No</option>
-                    </select>
-                </div>
-
-                <div class="cooking-time">
-                    <h4>Cooking time?</h4>
-                    <label for="time-select"></label>
-                    <select id="time-select" name="time" onchange="selectTime()">
-                        <option value="" disabled selected>Select</option>
-                        <option value="15min">15 minutes</option>
-                        <option value="30min">30 minutes</option>
-                        <option value="45min">45 minutes</option>
-                        <option value="1hr">1 hour</option>
-                        <option value="1hr30min">1 hour 30 minutes</option>
-                        <option value="2hr">2 hours</option>
-                        <option value="any-time">Does not matter</option>
-                    </select>
-                </div>
-
-                <div class="serving">
-                    <h4>For how many people?</h4>
-                    <label for="servings-select"></label>
-                    <select id="servings-select" name="servings">
-                        <option value="" disabled selected>Select</option>
-                        <option value="1">One person</option>
-                        <option value="2">Two people</option>
-                        <option value="3~4">Three to Four people</option>
-                        <option value="5~6">Five to Six people</option>
-                    </select>
-                </div>
+        <div class="row justify-content-center py-5">
+            <div class="dropdown-food">
+                <h4>Cuisine</h4>
+                <label for="cuisine-select"></label>
+                <select id="cuisine-select" name="cuisine" onchange="selectCuisine()">
+                    <option value="" disabled selected>Select</option>
+                    <option value="italian">Italian</option>
+                    <option value="mexican">Mexican</option>
+                    <option value="indian">Indian</option>
+                    <option value="chinese">Chinese</option>
+                    <option value="korean">Korean</option>
+                    <option value="japanese">Japanese</option>
+                    <option value="mediterranean">Mediterranean</option>
+                    <option value="random">Any</option>
+                </select>
             </div>
-            <div class="col-md-12 text-center">
-                <button class="w-30 btn btn-lg btn-primary rounded-pill px-3" type="submit">Submit</button>
-                <button class="w-30 btn btn-lg btn-info rounded-pill px-3" type="button" onclick="window.location.href='/members'">Return home</button>
+            <div class="spicy">
+                <h4>Do you like spicy food?</h4>
+                <label for="spicy-select"></label>
+                <select id="spicy-select" name="spicy" onchange="spicyLevel()">
+                    <option value="" disabled selected>Select</option>
+                    <option value="Spicy-Yes">Yes</option>
+                    <option value="Spicy-No">No</option>
+                </select>
             </div>
+
+            <div class="cooking-time">
+                <h4>Cooking time?</h4>
+                <label for="time-select"></label>
+                <select id="time-select" name="time" onchange="selectTime()">
+                    <option value="" disabled selected>Select</option>
+                    <option value="15min">15 minutes</option>
+                    <option value="30min">30 minutes</option>
+                    <option value="45min">45 minutes</option>
+                    <option value="1hr">1 hour</option>
+                    <option value="1hr30min">1 hour 30 minutes</option>
+                    <option value="2hr">2 hours</option>
+                    <option value="any-time">Does not matter</option>
+                </select>
+            </div>
+
+            <div class="serving">
+                <h4>For how many people?</h4>
+                <label for="servings-select"></label>
+                <select id="servings-select" name="servings">
+                    <option value="" disabled selected>Select</option>
+                    <option value="1">One person</option>
+                    <option value="2">Two people</option>
+                    <option value="3~4">Three to Four people</option>
+                    <option value="5~6">Five to Six people</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-12 text-center">
+            <!-- Submit button -->
+            <button class="w-30 btn btn-lg btn-primary rounded-pill px-3" type="submit">Submit</button>
+            <!-- Return home button -->
+            <button class="w-30 btn btn-lg btn-info rounded-pill px-3" type="button" onclick="window.location.href='/members'">Return home</button>
+        </div>
     </form>
 </div>
+
+<!-- Include footer template -->
 <%- include("templates/footer") %>

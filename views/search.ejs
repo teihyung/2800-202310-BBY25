@@ -1,7 +1,8 @@
+<!-- Including header template -->
 <%- include("templates/header") %>
 
+<!-- CSS Styling -->
 <style>
-
   .content-wrapper {
     background-color: rgba(255, 255, 255, 0.8);
     padding: 20px;
@@ -25,23 +26,22 @@
   }
 </style>
 
-<!-- Add this inside your HTML body -->
+<!-- Loading spinner -->
 <div id="loading-spinner" style="display: none; position: fixed; z-index: 999; height: 100%; width: 100%; top: 0; left: 0; background-color: rgba(255, 255, 255, 0.8);">
   <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
     <img src="/img/spinner.gif" alt="Loading...">
   </div>
 </div>
 
-
-
 <% if (recipes.length > 0) { %>
+  <!-- Recipes section -->
   <div class="container mt-5">
     <div class="content-wrapper">
       <h2>Recipes</h2>
       <ul class="list-group">
         <% recipes.forEach(function(recipe) { %>
         <li class="list-group-item list-group-item-custom">
-
+          <!-- Link to each recipe -->
             <a href="/recipe/<%= encodeURIComponent(recipe) %>"><%= recipe %></a>
           </li>
         <% }); %>
@@ -50,34 +50,24 @@
   </div>
 <% } %>
 
-
-
-
-
-
-
-
-
-
-
-
-
 <script>
+  // Function to display the loading spinner
   function showSpinner() {
     document.getElementById('loading-spinner').style.display = 'block';
   }
 
-  // Attach event listener to all anchor tags
+  // Attach event listeners to all links to show the spinner on click
   document.querySelectorAll('a').forEach(function(link) {
     link.addEventListener('click', function(event) {
-      showSpinner(); // Show the spinner
+      showSpinner(); 
     });
   });
 
+  // Show the spinner before the page is unloaded (e.g., when navigating to a new page)
   window.addEventListener('beforeunload', function() {
-    showSpinner(); // Show the spinner before leaving the page
+    showSpinner(); 
   });
 </script>
 
-
+<!-- Include footer template -->
 <%- include("templates/footer") %>
