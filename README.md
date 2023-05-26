@@ -129,7 +129,14 @@ subfolders and files:
     search.ejs			# display the result from the search bar and filter
     shopping-list.ejs		# shopping list save
     shoppingList.ejs		# display shopping list
-```
+## 6. Credits
+* [MealDB API](https://www.themealdb.com/api.php)
+* [GhatGPT API](https://developers.google.com/gmail/api)](https://platform.openai.com/docs/introduction)
+* [Bootstrap](https://getbootstrap.com/)
+* [Font Awesome](https://fontawesome.com/)
+* [Google Fonts](https://fonts.google.com/)
+
+
     
     
     
