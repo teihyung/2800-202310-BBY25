@@ -1,5 +1,9 @@
-//This code sets up a MongoDB connection using environment variables for
-// the host, username, and password, and exports the created MongoClient instance for database operations.
+/**
+ *  This code sets up a MongoDB connection using environment variables for
+ *  the host, username, and password, and exports the created MongoClient instance for database operations.
+ *
+ *  @module databaseConnection
+ */
 require('dotenv').config();
 
 const mongodb_host = process.env.MONGODB_HOST;

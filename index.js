@@ -1,4 +1,17 @@
-// requirement imports for the project and instance variables
+/**
+ * requirement imports for the project and instance variables
+ *
+ * @type {module:fs}
+ * @type {module:express}
+ * @type {module:express-session}
+ * @type {module:connect-mongo}
+ * @type {module:bcrypt}
+ * @type {number}
+ * @type {module:openai}
+ * @type {module:dotenv}
+ * @type {module:csv-parser}
+ *
+ */
 require("./utils.js");
 
 require("dotenv").config();
@@ -33,7 +46,12 @@ const openaiConfiguration = new Configuration({
 });
 const openai = new OpenAIApi(openaiConfiguration);
 
-// This is a page that renders the first page of the website
+/**
+ * This is a page that renders the first page of the website
+ *
+ * @version 1.0
+ * @author Tae Hyung Lee, Yeju Jung, Bingdi Zhou, Taehyuk Chung
+ */
 app.get("/", (req, res) => {
   res.render("main");
 });
@@ -57,7 +75,6 @@ app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: false }));
 app.use("/img", express.static("./img"));
 
-// store the mongo connection in the session
 var mongoStore = MongoStore.create({
   mongoUrl: `mongodb+srv://${mongodb_user}:${mongodb_password}@${mongodb_host}/sessions`,
   crypto: {
@@ -74,7 +91,13 @@ app.use(
   })
 );
 
-// update the session expiration time on each request and update the code for resetPassword.
+/**
+ *  update the session expiration time on each request and update the code for resetPassword.
+ *
+ * @param email as user's email
+ * @param code as user's reset code
+ * @returns {Promise<void>}
+ */
 async function saveResetCode(email, code) {
   const expirationTime = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes from now
   // Update the user's document in MongoDB with the reset code
@@ -84,7 +107,13 @@ async function saveResetCode(email, code) {
   );
 }
 
-// update the password for the user that was validated with the reset code
+/**
+ * update the password for the user that was validated with the reset code
+ *
+ * @param email as user's email
+ * @param password as user's password
+ * @returns {Promise<void>}
+ */
 async function updatePassword(email, password) {
   const hashedPassword = await bcrypt.hash(password, saltRounds);
 
@@ -95,13 +124,22 @@ async function updatePassword(email, password) {
   );
 }
 
-// code generator for the reset code
+/**
+ * code generator for the reset code
+ *
+ * @returns {number} the reset code
+ */
 function generateRandomCode() {
   // Generate a random 6-digit number
   return Math.floor(100000 + Math.random() * 900000);
 }
 
-// middleware returns boolean value to check if the user has a valid session
+/**
+ * middleware returns boolean value to check if the user has a valid session
+ *
+ * @param req request object
+ * @returns {boolean} true if the user has a valid session, false otherwise
+ */
 function isValidSession(req) {
   if (req.session.authenticated) {
     return true;
@@ -109,7 +147,13 @@ function isValidSession(req) {
   return false;
 }
 
-// middleware that checks if the user is valid to be in the session
+/**
+ * middleware that checks if the user is valid to be in the session
+ *
+ * @param req request object
+ * @param res response object
+ * @param next next function
+ */
 function sessionValidation(req, res, next) {
   if (isValidSession(req)) {
     next();
@@ -118,7 +162,12 @@ function sessionValidation(req, res, next) {
   }
 }
 
-// nosql injection attack code
+/**
+ * nosql injection attack code
+ *
+ * @param res response object
+ * @param req request object
+ */
 app.get("/nosql-injection", async (req, res) => {
   var username = req.query.user;
 
@@ -158,12 +207,22 @@ app.get("/nosql-injection", async (req, res) => {
   res.send(`<h1>Hello ${username}</h1>`);
 });
 
-// app.get function that renders to the create user page
+/**
+ * app.get function that renders to the create user page
+ *
+ * @param req request object
+ * @param res response object
+ */
 app.get("/createUser", (req, res) => {
   res.render("createUser");
 });
 
-// app.get function that renders user to members if logged in, else renders to login page
+/**
+ * app.get function that renders user to members if logged in, else renders to login page
+ *
+ * @param req request object
+ * @param res response object
+ */
 app.get("/login", (req, res) => {
   if (req.session.authenticated) {
     res.redirect("/members");
@@ -172,7 +231,12 @@ app.get("/login", (req, res) => {
   }
 });
 
-// create user function that creates a user and stores it in the database
+/**
+ * create user function that creates a user and stores it in the database
+ *
+ * @param req request object
+ * @param res response object
+ */
 app.post("/submitUser", async (req, res) => {
   var email = req.body.email;
   var username = req.body.username;
@@ -233,7 +297,12 @@ app.post("/submitUser", async (req, res) => {
   }
 });
 
-// validate user function that checks if the user is valid when logging in
+/**
+ * validate user function that checks if the user is valid when logging in
+ *
+ * @param req request object
+ * @param res response object
+ */
 app.post("/loggingin", async (req, res) => {
   var email = req.body.email;
   var username = req.body.username;
@@ -281,13 +350,23 @@ app.post("/loggingin", async (req, res) => {
   }
 });
 
-// logout function that logs the user out
+/**
+ * logout function that logs the user out
+ *
+ * @param req The request object
+ * @param res The response object
+ */
 app.get("/logout", (req, res) => {
   req.session.destroy();
   res.render("logout");
 });
 
-// app.get function that renders user to members if logged in, else renders to login page
+/**
+ * app.get function that renders user to members if logged in, else renders to login page
+ *
+ * @param req The request object
+ * @param res The response object
+ */
 app.get("/loggedin", (req, res) => {
   if (!req.session.authenticated) {
     res.redirect("/login");
@@ -295,12 +374,22 @@ app.get("/loggedin", (req, res) => {
   res.render("loggedin");
 });
 
-// render to forgot password page
+/**
+ * render to forgot password page
+ *
+ * @param req The request object
+ * @param res The response object
+ */
 app.get("/forgot-password", (req, res) => {
   res.render("forgot-password");
 });
 
-// post function that sends the reset password email
+/**
+ * post function that sends the reset password email
+ *
+ * @param req The request object
+ * @param res The response object
+ */
 app.post("/forgot-password", async (req, res) => {
   const { email } = req.body;
 
@@ -329,7 +418,12 @@ app.post("/forgot-password", async (req, res) => {
   }
 });
 
-// render to reset password page that checks if the user put in the correct code
+/**
+ * render to reset password page that checks if the user put in the correct code
+ *
+ * @param req The request object
+ * @param res The response object
+ */
 app.get("/reset-password", async (req, res) => {
   if (req.session.forgotPassword) {
     // User not authorized, redirect to an error page or appropriate route
@@ -347,7 +441,12 @@ app.get("/reset-password", async (req, res) => {
   res.render("reset-password");
 });
 
-// post function that checks if the user put in the correct code
+/**
+ * post function that checks if the user put in the correct code
+ *
+ * @param req The request object
+ * @param res The response object
+ */
 app.post("/reset-password", async (req, res) => {
   const { email, code } = req.body;
   const user = await findUserByEmail(req.session.email);
@@ -374,13 +473,22 @@ app.post("/reset-password", async (req, res) => {
   }
 });
 
-// get random recipes function that gets 5 random recipes from the dataset
+/**
+ * get random recipes function that gets 5 random recipes from the dataset
+ * @param data from the csv file
+ * @param count the number of random recipes to get
+ * @returns {*} the random recipes
+ */
 function getRandomRecipes(data, count) {
   const shuffledData = data.sort(() => 0.5 - Math.random());
   return shuffledData.slice(0, count);
 }
 
-// parse the csv file and get the random recipes
+/**
+ * parse the csv file and get the random recipes
+ *
+ * @returns {Promise<unknown>} The promise that resolves to the random recipes
+ */
 function getRandomRecipeSuggestions() {
   return new Promise((resolve, reject) => {
     const csvFilePath = "dataset.csv";
@@ -403,12 +511,22 @@ function getRandomRecipeSuggestions() {
 
 let randomRecipes;
 
-// Easter egg function that renders the genie page in the search bar
+/**
+ * Easter egg function that renders the genie page in the search bar
+ *
+ * @param req The request object
+ * @param res The response object
+ */
 app.get("/kitchenGenie", (req, res) => {
   res.render("kitchenGenie"); // Render the "Genie" view
 });
 
-// members page when user logs in the website
+/**
+ * members page when user logs in the website
+ *
+ * @param req The request object
+ * @param res The response object
+ */
 app.get("/members", async (req, res) => {
   if (req.session.authenticated) {
     try {
@@ -490,12 +608,24 @@ app.get("/members", async (req, res) => {
   }
 });
 
-// error page when unexpected error occurs
+/**
+ * error page when unexpected error occurs
+ *
+ * @param req The request object
+ * @param res The response object
+ */
 app.use((error, req, res, next) => {
   res.status(500).render("error", { error: error.message });
 });
 
-// profile page that shows the user's profile including username, email, hidden password, and status
+
+
+/**
+ * profile page that shows the user's profile including username, email, hidden password, and status
+ *
+ * @param req The request object
+ * @param res The response object
+ */
 app.get("/profile", async (req, res) => {
   if (req.session.authenticated) {
     try {

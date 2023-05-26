@@ -1,4 +1,8 @@
-// code that shows and hides the spinner
+/**
+ * code that shows and hides the spinner
+ *
+ * @author Bingdi Zhou
+ */
 document.addEventListener('DOMContentLoaded', function () {
     const recipeLinks = document.querySelectorAll('.recipe-link');
   

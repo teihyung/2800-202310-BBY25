@@ -7,8 +7,15 @@ const {createTransport} = require("nodemailer");
 const findUserByEmail = require('./user').findUserByEmail;
 
 
-
-// function to send email to user with password reset code
+/**
+ * function to send email to user with password reset code
+ *
+ * @param email as user's email
+ * @param code as reset password code
+ * @returns {Promise<void>}
+ *
+ * @author Tae Hyung Lee
+ */
 async function sendResetPasswordEmail(email, code) {
     const user = await findUserByEmail(email);
     const name = user.username;
